@@ -1,19 +1,7 @@
-version: '3'
+version: '2'
 
 services:
-  agent:
-    image: drone/drone:0.7
-    container-name: agent
-    command: agent
-    restart: always
-    depends_on: [ server ]
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      - DRONE_SERVER=ws://server:8000/ws/broker
-      - DRONE_SECRET=${TEST_DRONE_SECRET}
-
-  server:
+  drone-server:
     image: drone/drone:0.7
     container-name: server
     expose:
@@ -31,8 +19,6 @@ services:
       - DRONE_GITHUB_SECRET=${TEST_DRONE_GITHUB_SECRET}
       - DRONE_GITHUB_PRIVATE_MODE=true
       - DRONE_SECRET=${TEST_DRONE_SECRET}
-    deploy:
-      replicas: 2
 
   nginx:
     image: nginx:stable-alpine
@@ -45,4 +31,28 @@ services:
       - ./nginx/conf:/etc/nginx/conf.d:ro
       - /nginx/html:/usr/share/nginx/html:ro
     restart: always
-    depends_on: [ server ]
+    depends_on: [ drone-server ]
+
+  agent-1:
+    image: drone/drone:0.7
+    container-name: agent-1
+    command: agent
+    restart: always
+    depends_on: [ drone-server ]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DRONE_SERVER=ws://drone-server:8000/ws/broker
+      - DRONE_SECRET=${TEST_DRONE_SECRET}
+
+  agent-2:
+    image: drone/drone:0.7
+    container-name: agent-2
+    command: agent
+    restart: always
+    depends_on: [ drone-server ]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DRONE_SERVER=ws://drone-server:8000/ws/broker
+      - DRONE_SECRET=${TEST_DRONE_SECRET}
