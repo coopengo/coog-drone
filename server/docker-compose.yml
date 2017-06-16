@@ -1,0 +1,48 @@
+version: '3'
+
+services:
+  agent:
+    image: drone/drone:0.7
+    container-name: agent
+    command: agent
+    restart: always
+    depends_on: [ server ]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DRONE_SERVER=ws://server:8000/ws/broker
+      - DRONE_SECRET=${TEST_DRONE_SECRET}
+
+  server:
+    image: drone/drone:0.7
+    container-name: server
+    expose:
+      - "8000"
+    volumes:
+      - ./drone:/var/lib/drone/
+    restart: always
+    environment:
+      - DRONE_ADMIN=botCoopengo
+      - DRONE_HOST=https://drone.coopengo.com
+      - DRONE_OPEN=true
+      - DRONE_GITHUB=true
+      - DRONE_ORGS=coopengo
+      - DRONE_GITHUB_CLIENT=${TEST_DRONE_GITHUB_CLIENT}
+      - DRONE_GITHUB_SECRET=${TEST_DRONE_GITHUB_SECRET}
+      - DRONE_GITHUB_PRIVATE_MODE=true
+      - DRONE_SECRET=${TEST_DRONE_SECRET}
+    deploy:
+      replicas: 2
+
+  nginx:
+    image: nginx:stable-alpine
+    container-name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/letsencrypt/:/etc/nginx/certs/:ro
+      - ./nginx/conf:/etc/nginx/conf.d:ro
+      - /nginx/html:/usr/share/nginx/html:ro
+    restart: always
+    depends_on: [ server ]
