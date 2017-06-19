@@ -25,7 +25,7 @@ RUN apk add --no-cache --virtual .build-deps \
         requests \
         werkzeug \
         wrapt \
-        ldap3 \
+        "ldap3<2.0" \
         pyflakes \
         dateutils \
         num2words \
