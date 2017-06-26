@@ -1,0 +1,35 @@
+#!/bin/sh
+
+update_git() {
+        (cd /workspace/drone/coog && git fetch --recurse-submodules=yes origin "$DRONE_BRANCH")
+}
+
+get_modules() {
+        cd /workspace/drone/coog \
+        && git diff --name-only $(git merge-base origin/"$DRONE_BRANCH" "$DRONE_COMMIT_SHA") "$DRONE_COMMIT_SHA" \
+        | grep "^modules" \
+        | cut -d "/" -f 2 \
+        | sort \
+        | uniq
+}
+
+main() {
+        update_git || return 1
+
+      	local errors;
+      	local modules; modules=$(get_modules)
+
+        for module in $modules
+        do
+                errors=$(flake8 --config=/workspace/drone/coog/tox.ini "/workspace/drone/coog/modules/$module")
+
+                if [ ${#errors} -eq 0 ]
+              	then
+           		echo "No flake8 error detected, good job!"
+              	else
+              		echo "$errors" && return 1
+              	fi
+        done
+}
+
+main
