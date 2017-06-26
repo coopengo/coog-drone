@@ -26,7 +26,7 @@ update_git() {
 
                 echo "Coog branch/version will be $branch."
 
-                (cd /workspace/drone/coog && git fetch "$branch" && git checkout FETCH_HEAD)
+                git clone -b "$branch" --depth=1 https://github.com/coopengo/coog /workspace/drone/coog
 
                 if [ -f /workspace/drone/customers/modules ]
                 then
@@ -43,8 +43,13 @@ update_git() {
 
 # ----- GETTING MODULES TO TEST ------ #
 get_modules() {
-        cd /workspace/drone/coog
-        git diff --name-only $(git merge-base origin/"$DRONE_BRANCH" "$DRONE_COMMIT_SHA") "$DRONE_COMMIT_SHA" | grep "^modules" | cut -d "/" -f 2 | sort | uniq
+        if [ "$DRONE_REPO_NAME" == "coog" ]
+        then
+                cd /workspace/drone/coog
+                git diff --name-only $(git merge-base origin/"$DRONE_BRANCH" "$DRONE_COMMIT_SHA") "$DRONE_COMMIT_SHA" | grep "^modules" | cut -d "/" -f 2 | sort | uniq
+        else
+                ls /workspace/drone/customers
+        fi
 }
 
 # ---------- LINKING MODULES --------- #
