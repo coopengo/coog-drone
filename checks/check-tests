@@ -26,12 +26,8 @@ update_git() {
 
                 git clone -b "$branch" --depth=1 https://github.com/coopengo/coog /workspace/drone/coog
 
-                if [ -f /workspace/drone/customers/modules ]
-                then
-                        cp /workspace/drone/customers/modules/* /workspace/drone/coog/modules/
-                else
-                        exit 0
-                fi
+
+                [ ! -d /workspace/drone/customers/modules ] && exit 0
         fi
 
         git clone --depth=1 --recursive --branch "$branch" https://github.com/coopengo/trytond.git /workspace/trytond &&
@@ -72,6 +68,7 @@ _link_modules() {
         find /workspace/trytond/trytond/modules -type l -delete
         ln -sf "/workspace/trytond-modules/modules/"* .
         ln -sf "/workspace/drone/coog/modules/"* .
+        [ "$DRONE_REPO_NAME" == "customers" ] && ln -sf "/workspace/drone/customers/modules" .
 }
 
 link_modules() {
