@@ -4,10 +4,8 @@
 update_git() {
         local branch; branch="$DRONE_BRANCH"
 
-        if [ "$DRONE_REPO_NAME" == "coog" ]
+        if [ "$DRONE_REPO_NAME" == "customers" ]
         then
-                (cd /workspace/drone/coog && git fetch --recurse-submodules=yes origin "$branch")
-        else
                 echo "$DRONE_BRANCH" | grep -qE "[a-z]+$"
 
                 if [ $? -eq 0 ]
@@ -48,7 +46,7 @@ get_modules() {
                 cd /workspace/drone/coog
                 git diff --name-only $(git merge-base origin/"$DRONE_BRANCH" "$DRONE_COMMIT_SHA") "$DRONE_COMMIT_SHA" | grep "^modules" | cut -d "/" -f 2 | sort | uniq
         else
-                ls /workspace/drone/customers
+                ls /workspace/drone/customers/modules
         fi
 }
 

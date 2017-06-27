@@ -1,9 +1,5 @@
 #!/bin/sh
 
-update_git() {
-        (cd /workspace/drone/coog && git fetch --recurse-submodules=yes origin "$DRONE_BRANCH")
-}
-
 get_modules() {
         if [ "$DRONE_REPO_NAME" == "coog" ]
         then
@@ -19,8 +15,6 @@ get_modules() {
 }
 
 main() {
-        update_git || return 1
-
       	local errors;
       	local modules; modules=$(get_modules)
 
