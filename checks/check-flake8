@@ -1,0 +1,22 @@
+#!/bin/sh
+
+main() {
+        source /tests/checks/utils  # get_modules
+
+      	local errors;
+      	local modules; modules=$(get_modules)
+
+        for module in $modules
+        do
+                errors=$(flake8 --config=/workspace/drone/coog/tox.ini "/workspace/drone/coog/modules/$module")
+
+                if [ ${#errors} -eq 0 ]
+              	then
+           		echo "No flake8 error detected, good job!"
+              	else
+              		echo "$errors" && return 1
+              	fi
+        done
+}
+
+main

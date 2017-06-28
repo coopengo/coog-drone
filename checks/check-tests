@@ -1,0 +1,19 @@
+#!/bin/sh
+
+main() {
+        source /tests/checks/utils  # get_modules
+
+        unset DB_NAME
+        unset TRYTOND_CACHE_CLASS
+        local module
+        for module in $(get_modules)
+        do
+        	echo "----------------------------"
+         	echo "Testing $module..."
+         	echo "----------------------------"
+         	LOG_LEVEL=DEBUG python -W ignore /workspace/trytond/trytond/tests/run-tests.py \
+                -c /workspace/conf/trytond.conf -vv -m $module
+        done
+}
+
+main
