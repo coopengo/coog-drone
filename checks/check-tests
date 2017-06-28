@@ -35,22 +35,11 @@ update_git() {
         git clone --depth=1 --recursive --branch "$branch" https://github.com/coopengo/proteus.git /workspace/proteus
 }
 
-# ----- GETTING MODULES TO TEST ------ #
-get_modules() {
-        if [ "$DRONE_REPO_NAME" == "coog" ]
-        then
-                cd /workspace/drone/coog
-                git diff --name-only $(git merge-base origin/"$DRONE_BRANCH" "$DRONE_COMMIT_SHA") "$DRONE_COMMIT_SHA" | grep "^modules" | cut -d "/" -f 2 | sort | uniq
-        else
-                ls /workspace/drone/customers/modules
-        fi
-}
-
 # ---------- LINKING MODULES --------- #
 
 init_bin() {
-        ln -sf /workspace/tryton/bin/trytond /usr/local/bin/trytond
-        ln -sf /workspace/trytond/bin/trytond-admin /usr/local/bin/trytond-admin
+        ln -s /workspace/tryton/bin/trytond /usr/local/bin/trytond
+        ln -s /workspace/trytond/bin/trytond-admin /usr/local/bin/trytond-admin
 }
 
 init_conf() {
@@ -66,9 +55,9 @@ init_conf() {
 
 _link_modules() {
         find /workspace/trytond/trytond/modules -type l -delete
-        ln -sf "/workspace/trytond-modules/modules/"* .
-        ln -sf "/workspace/drone/coog/modules/"* .
-        [ "$DRONE_REPO_NAME" == "customers" ] && ln -sf "/workspace/drone/customers/modules" .
+        ln -s "/workspace/trytond-modules/modules/"* . || return 1
+        ln -s "/workspace/drone/coog/modules/"* . || return 1
+        [ "$DRONE_REPO_NAME" == "customers" ] && ln -s "/workspace/drone/customers/modules" .
 }
 
 link_modules() {
@@ -90,12 +79,13 @@ test_modules() {
 }
 
 main() {
-        update_git &&
-        init_bin && init_conf && link_modules &&
-        if [ -n "$DRONE_BRANCH" ]
-        then
-            	test_modules
-        fi
+        source /tests/checks/utils  # get_modules
+
+        update_git \
+        && init_bin \
+        && init_conf \
+        && link_modules \
+        && test_modules
 }
 
 main $@
