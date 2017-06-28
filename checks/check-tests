@@ -1,7 +1,7 @@
 #!/bin/sh
 
 main() {
-        source /tests/checks/utils  # get_modules
+        source /workspace/drone/tests/checks/utils  # get_modules
 
         unset DB_NAME
         unset TRYTOND_CACHE_CLASS
