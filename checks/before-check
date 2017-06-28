@@ -57,7 +57,7 @@ _link_modules() {
         find /workspace/trytond/trytond/modules -type l -delete
         ln -s "/workspace/trytond-modules/modules/"* . || return 1
         ln -s "/workspace/drone/coog/modules/"* . || return 1
-        [ "$DRONE_REPO_NAME" == "customers" ] && ln -s "/workspace/drone/customers/modules" .
+        [ "$DRONE_REPO_NAME" == "customers" ] && ln -s "/workspace/drone/customers/modules" . || return 1
 }
 
 link_modules() {
