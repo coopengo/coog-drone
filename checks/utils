@@ -8,6 +8,6 @@ get_modules() {
                 | sort \
                 | uniq
         else
-                ls -1 /workspace/drone/customers/modules
+                [ -d /workspace/drone/customers/modules ] && ls -1 /workspace/drone/customers/modules
         fi
 }
