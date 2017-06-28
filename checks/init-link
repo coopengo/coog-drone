@@ -1,0 +1,74 @@
+#!/bin/sh
+
+# ------------- FETCHING ------------- #
+update_git() {
+        local branch; branch="$DRONE_BRANCH"
+
+        if [ "$DRONE_REPO_NAME" == "customers" ]
+        then
+                echo "$DRONE_BRANCH" | grep -qE "[a-z]+$"
+
+                if [ $? -eq 0 ]
+                then
+                        branch="master"
+                else
+                        echo "$DRONE_BRANCH" | grep -qE "coog-1\.(10|12)"
+
+                        if [ $? -eq 0 ]
+                        then
+                                branch=$(echo "$DRONE_BRANCH" | cut -d "-" -f 2,3)
+                        else
+                                exit 0
+                        fi
+                fi
+
+                echo "Coog branch/version will be $branch."
+
+                git clone -b "$branch" --depth=1 https://github.com/coopengo/coog /workspace/drone/coog
+
+
+                [ ! -d /workspace/drone/customers/modules ] && exit 0
+        fi
+
+        git clone --depth=1 --recursive --branch "$branch" https://github.com/coopengo/trytond.git /workspace/trytond &&
+        git clone --depth=1 --recursive --branch "$branch" https://github.com/coopengo/trytond-modules.git /workspace/trytond-modules &&
+        git clone --depth=1 --recursive --branch "$branch" https://github.com/coopengo/proteus.git /workspace/proteus
+}
+
+# ---------- LINKING MODULES --------- #
+
+init_bin() {
+        ln -s /workspace/tryton/bin/trytond /usr/local/bin/trytond
+        ln -s /workspace/trytond/bin/trytond-admin /usr/local/bin/trytond-admin
+}
+
+init_conf() {
+        {
+                echo "[database]"
+                echo "uri = postgresql://postgres:postgres@database:5432"
+                echo "[env]"
+                echo "testing = True"
+                echo "[async]"
+                echo "rq = redis://127.0.0.1:6379/1"
+        } > /workspace/conf/trytond.conf
+}
+
+_link_modules() {
+        find /workspace/trytond/trytond/modules -type l -delete
+        ln -s "/workspace/trytond-modules/modules/"* . || return 1
+        ln -s "/workspace/drone/coog/modules/"* . || return 1
+        [ "$DRONE_REPO_NAME" == "customers" ] && ln -s "/workspace/drone/customers/modules" .
+}
+
+link_modules() {
+        (cd /workspace/trytond/trytond/modules && _link_modules)
+}
+
+main() {
+        update_git \
+        && init_bin \
+        && init_conf \
+        && link_modules
+}
+
+main $@
