@@ -44,12 +44,12 @@ const getLabels = (json) => {
 
 const checkTitle = (json) => {
   const title = json.title
-
-  !title.includes(': ')
-      ? _throw('Title should be "<module>: <short title>"')
+  return
+    title.includes(': ')
+      ? 'Title should be "<module>: <short title>"'
       : title.slice(-3) === '…'
-          ? _throw('Title should not end with "…"')
-          : console.log('Title is ok.')
+        ? 'Title should not end with "…"'
+        : true
 }
 
 const getRedmineRef = (body) => {
@@ -68,68 +68,58 @@ const getRedmineRef = (body) => {
   throw new Error('Missing redmine issue reference.')
 }
 
-const checkRedmineRef = (body) => {
-  const ref = getRedmineRef(body)
-  console.log(`Redmine issue identified as ${ref.type} #${ref.issue}.`)
-
-  const lines = body.trim().split('\n')
-  lines.length === 1
-    ? console.log('Body seems ok.')
-    : lines.splice(-2, 1)[0] === '\r'
-      ? console.log('Body seems ok.')
-      : _throw('Missing empty line before redmine reference')
-}
-
 const checkBody = (json) => {
   const body = json.body
 
-  !body
-    ? _throw('Body is empty.')
-    : checkRedmineRef(body)
-}
+  const ref = getRedmineRef(body)
+  console.log(`Redmine issue identified as ${ref.type} #${ref.issue}.`)
 
-const checkRedmineIssue = (json, labels) => {
-  const ref = getRedmineRef(json.body)
-
-  axios.get(`${redmineUri}/issues/${ref.issue}.json`, {
-    auth: {
-      username: process.env.REDMINE_TOKEN,
-      password: ''
-    }
-  }).then(({data}) => {
-    const issue = data.issue
-
-    if (labels.includes('bug')) {
-      if (ref.type === 'Fix' && !issue.tracker.id === 1) {
-        throw new Error(`Issue ${ref.issue} is not a bug!`)
-      } else if (ref.type === 'Ref' && ![2, 3].includes(issue.tracker.id)) {
-        throw new Error(`Ref ${ref.issue} is not a feature!`)
-      }
-    }
-    if (labels.includes('enhancement')) {
-      if ([2, 3].includes('issue.tracker.id')) { throw new Error(`Issue ${ref.issue} is not a feature!`) }
-    }
-    if (!ALLOWED_PROJECTS[json.base.repo.full_name].map((x) => { return x[0] }).includes(issue.project.id)) {
-      throw new Error(`Bad project for issue ${ref.issue}.`)
-    }
-    if ((labels.includes('bug') && !labels.includes('cherry checked')) === true) {
-      throw new Error('Missing cherry check.')
-    }
-
-    console.log("Everything's fine here.")
-  }).catch((err) => {
-    err.response.status === 404
-      ? _throw('Issue seems not to exist: ' + err.response.status)
-      : _throw('Could not reach Redmine\n' + err.message)
-  })
+  return body
+    ? true
+    : 'Body is empty.'
 }
 
 const checkLabels = (json, labels) => {
-  labels.includes('bug') && labels.includes('enhancement')
-    ? _throw('Cannot have both "bug" and "enhancement" label')
-    : !labels.includes('bug') && !labels.includes('enhancement')
-      ? _throw('No bug or enhancement labels found')
-      : checkRedmineIssue(json, labels)
+  const ref = getRedmineRef(json.body)
+
+  return new Promise((resolve, reject) => {
+    axios.get(`${redmineUri}/issues/${ref.issue}.json`, {
+      auth: {
+        username: process.env.REDMINE_TOKEN,
+        password: ''
+      }
+    }).then(({data}) => {
+      const issue = data.issue
+
+      labels.includes('bug') && labels.includes('enhancement')
+        ? reject(new Error('Cannot have both "bug" and "enhancement" label'))
+        : !labels.includes('bug') && !labels.includes('enhancement') & reject(new Error('No bug or enhancement labels found'))
+
+
+      if (labels.includes('bug')) {
+        if (ref.type === 'Fix' && !issue.tracker.id === 1) {
+          reject(new Error(`Issue ${ref.issue} is not a bug!`))
+        } else if (ref.type === 'Ref' && ![2, 3].includes(issue.tracker.id)) {
+          reject(new Error(`Ref ${ref.issue} is not a feature!`))
+        }
+      }
+      if (labels.includes('enhancement')) {
+        if ([2, 3].includes('issue.tracker.id')) { reject(new Error(`Issue ${ref.issue} is not a feature!`)) }
+      }
+      if (!ALLOWED_PROJECTS[json.base.repo.full_name].map((x) => { return x[0] }).includes(issue.project.id)) {
+        reject(new Error(`Bad project for issue ${ref.issue}.`))
+      }
+      if ((labels.includes('bug') && !labels.includes('cherry checked')) === true) {
+        reject(new Error('Missing cherry check.'))
+      }
+
+      resolve(true)
+    }).catch((err) => {
+      err.response.status === 404
+        ? reject(new Error('Issue seems not to exist: ' + err.response.status))
+        : reject(new Error('Could not reach Redmine\n' + err.message))
+    })
+  })
 }
 
 const getIssuesFromLogs = (logs) => {
@@ -195,11 +185,9 @@ const checkContents = (json, labels) => {
 
             if (logs.length === 0) reject(new Error('Malformed logs. No FEA, BUG or OTH detected in CHANGELOG.'))
 
-            const issues = getIssuesFromLogs(logs)
+            checkIssues(getIssuesFromLogs(logs), labels).catch((err) => { reject(err) })
 
-            checkIssues(issues, labels).catch((err) => { reject(err) })
-
-            resolve('CHANGELOGs seem ok.')
+            resolve(!logs[0].includes('* OTH'))
           }
         })
       } else {
@@ -212,44 +200,60 @@ const checkContents = (json, labels) => {
   })
 }
 
+const capitalize = (word) => {
+  return word.charAt(0).toUpperCase() + word.slice(1)
+}
+
+const print = (res) => {
+  const keys = Object.keys(res)
+
+  keys.forEach((key) => {
+    const msg = res[key] === true ? 'Ok   ✔' : `${res[key]}   ✖`
+    console.log(`  > ${capitalize(key)}     --> ${msg}`)
+  })
+}
+
 const main = () => {
   getData().then((json) => {
     process.RAW_JSON = json
     return getLabels(json)
   }).then((labels) => {
-    const arg = process.argv[2]
+    const result = {}
 
-    const checks = {
-      'title': checkTitle,
-      'body': checkBody,
-      'content': checkContents,
-      'label': checkLabels
-    }
-
-    if (labels.includes(`bypass ${arg} check`)) {
-      console.log(`${arg} forced.`.toUpperCase())
-    } else {
-      switch (arg) {
-        case 'label':
-          checks[arg](process.RAW_JSON, labels)
-          break
-
-        case 'content':
-          checks[arg](process.RAW_JSON, labels)
-            .then((msg) => { console.log(msg) })
-            .catch((err) => {
-              console.log(err)
-              process.exit(1)
-            })
-          break
-
-        case 'tests':
-          process.exit(1)
-
-        default:
-          checks[arg](process.RAW_JSON)
-          break
+    if (!labels.includes('bypass tests check')) {
+      if (!labels.includes('bypass title check')) {
+        result.title = checkTitle(process.RAW_JSON) || true
       }
+
+      if (!labels.includes('bypass content check')) {
+        checkContents(process.RAW_JSON, labels)
+          .then((res) => {
+            result.content = res
+            if (res) {
+              result.body = checkBody(process.RAW_JSON)
+
+              checkLabels(process.RAW_JSON, labels)
+                .then((data) => {
+                  result.labels = data
+                  print(result)
+                })
+                .catch((msg) => {
+                  result.labels = msg
+                  print(result)
+                })
+            } else {
+              console.log('Ignoring labels and body check as the issue is OTH type.')
+              print(result)
+            }
+          })
+          .catch((err) => {
+            result.content = err.message
+            print(result)
+          })
+      }
+    	
+    } else {
+    	console.log('TESTS FORCED.')
     }
   }).catch((err) => {
     console.log(err.message)
