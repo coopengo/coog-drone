@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -x
 
 # ------------- FETCHING ------------- #
 update_git() {
