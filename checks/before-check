@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/sh
 
 # ------------- FETCHING ------------- #
 update_git() {
@@ -57,7 +57,7 @@ _link_modules() {
         find /workspace/trytond/trytond/modules -type l -delete
         ln -sf "/workspace/trytond-modules/modules/"* . || return 1
         ln -sf "/workspace/drone/coog/modules/"* . || return 1
-        [ "$DRONE_REPO_NAME" == "customers" ] && ln -sf "/workspace/drone/customers/modules" . || return 1
+        [ "$DRONE_REPO_NAME" == "customers" ] && ln -sf "/workspace/drone/customers/modules" . || return 0
 }
 
 link_modules() {
