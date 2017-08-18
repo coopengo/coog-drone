@@ -219,42 +219,48 @@ const main = () => {
     return getLabels(json)
   }).then((labels) => {
     const result = {}
+    const arg = process.argv[2]
 
-    if (!labels.includes('bypass tests check')) {
-      if (!labels.includes('bypass title check')) {
-        result.title = checkTitle(process.RAW_JSON) || true
-      }
-
-      if (!labels.includes('bypass content check')) {
-        checkContents(process.RAW_JSON, labels)
-          .then((res) => {
-            result.content = res
-            if (res) {
-              result.body = checkBody(process.RAW_JSON)
-
-              checkLabels(process.RAW_JSON, labels)
-                .then((data) => {
-                  result.labels = data
-                  print(result)
-                })
-                .catch((msg) => {
-                  result.labels = msg
-                  print(result)
-                })
-            } else {
-              console.log('Ignoring labels and body check as the issue is OTH type.')
-              print(result)
-            }
-          })
-          .catch((err) => {
-            result.content = err.message
-            print(result)
-          })
-      }
-    	
+    if (arg === 'tests') {
+      process.exit(1)
     } else {
-    	console.log('TESTS FORCED.')
+      if (!labels.includes('bypass tests check')) {
+        if (!labels.includes('bypass title check')) {
+          result.title = checkTitle(process.RAW_JSON) || true
+        }
+
+        if (!labels.includes('bypass content check')) {
+          checkContents(process.RAW_JSON, labels)
+            .then((res) => {
+              result.content = res
+              if (res) {
+                result.body = checkBody(process.RAW_JSON)
+
+                checkLabels(process.RAW_JSON, labels)
+                  .then((data) => {
+                    result.labels = data
+                    print(result)
+                  })
+                  .catch((msg) => {
+                    result.labels = msg
+                    print(result)
+                  })
+              } else {
+                console.log('Ignoring labels and body check as the issue is OTH type.')
+                print(result)
+              }
+            })
+            .catch((err) => {
+              result.content = err.message
+              print(result)
+            })
+        }
+        
+      } else {
+        console.log('TESTS FORCED.')
+      }
     }
+    
   }).catch((err) => {
     console.log(err.message)
     process.exit(1)
