@@ -209,9 +209,10 @@ const print = (res) => {
   let reject = false
 
   keys.forEach((key) => {
-    res[key] !== true && reject = true 
     const msg = res[key] === true ? 'Ok   ✔' : `${res[key]}   ✖`
     console.log(`  > ${capitalize(key)}     --> ${msg}`)
+
+    if (res[key] !== true) reject = true
   })
 
   if (reject) process.exit(1)
