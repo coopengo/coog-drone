@@ -1,6 +1,7 @@
 version: '2'
 
 services:
+
   drone-server:
     image: drone/drone:0.7
     container-name: server
@@ -36,18 +37,6 @@ services:
   agent-1:
     image: drone/drone:0.7
     container-name: agent-1
-    command: agent
-    restart: always
-    depends_on: [ drone-server ]
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      - DRONE_SERVER=ws://drone-server:8000/ws/broker
-      - DRONE_SECRET=${TEST_DRONE_SECRET}
-
-  agent-2:
-    image: drone/drone:0.7
-    container-name: agent-2
     command: agent
     restart: always
     depends_on: [ drone-server ]
