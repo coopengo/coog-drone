@@ -206,11 +206,15 @@ const capitalize = (word) => {
 
 const print = (res) => {
   const keys = Object.keys(res)
+  let reject = false
 
   keys.forEach((key) => {
+    res[key] !== true && reject = true 
     const msg = res[key] === true ? 'Ok   ✔' : `${res[key]}   ✖`
     console.log(`  > ${capitalize(key)}     --> ${msg}`)
   })
+
+  if (reject) process.exit(1)
 }
 
 const main = () => {
