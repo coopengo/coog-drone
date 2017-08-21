@@ -4,7 +4,7 @@ services:
 
   drone-server:
     image: drone/drone:0.7
-    container-name: server
+    container_name: server
     expose:
       - "8000"
     volumes:
@@ -23,7 +23,7 @@ services:
 
   nginx:
     image: nginx:stable-alpine
-    container-name: nginx
+    container_name: nginx
     ports:
       - "80:80"
       - "443:443"
@@ -36,7 +36,7 @@ services:
 
   agent-1:
     image: drone/drone:0.7
-    container-name: agent-1
+    container_name: agent-1
     command: agent
     restart: always
     depends_on: [ drone-server ]
