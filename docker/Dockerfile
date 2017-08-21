@@ -53,4 +53,4 @@ RUN apk add --no-cache --virtual .build-deps \
     && apk del .build-deps
 
 RUN git config --system url.https://github.com/.insteadOf git@github.com:
-RUN mkdir /workspace/ /workspace/conf /workspace/tmp
+RUN mkdir /workspace/ /workspace/drone/ /workspace/drone/conf /workspace/drone/tmp

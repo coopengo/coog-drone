@@ -30,19 +30,20 @@ update_git() {
                 [ ! -d /workspace/drone/customers/modules ] && exit 0
         fi
 
-        git clone --depth=1 --recursive --branch "$branch" https://github.com/coopengo/trytond.git /workspace/trytond &&
-        git clone --depth=1 --recursive --branch "$branch" https://github.com/coopengo/trytond-modules.git /workspace/trytond-modules &&
-        git clone --depth=1 --recursive --branch "$branch" https://github.com/coopengo/proteus.git /workspace/proteus
+        git clone --depth=1 --recursive --branch "$branch" https://github.com/coopengo/trytond.git /workspace/drone/trytond &&
+        git clone --depth=1 --recursive --branch "$branch" https://github.com/coopengo/trytond-modules.git /workspace/drone/trytond-modules &&
+        git clone --depth=1 --recursive --branch "$branch" https://github.com/coopengo/proteus.git /workspace/drone/proteus
 }
 
 # ---------- LINKING MODULES --------- #
 
 init_bin() {
-        ln -sf /workspace/tryton/bin/trytond /usr/local/bin/trytond
-        ln -sf /workspace/trytond/bin/trytond-admin /usr/local/bin/trytond-admin
+        ln -sf /workspace/drone/tryton/bin/trytond /usr/local/bin/trytond
+        ln -sf /workspace/drone/trytond/bin/trytond-admin /usr/local/bin/trytond-admin
 }
 
 init_conf() {
+        mkdir /workspace/drone/conf
         {
                 echo "[database]"
                 echo "uri = postgresql://postgres:postgres@database:5432"
@@ -50,18 +51,18 @@ init_conf() {
                 echo "testing = True"
                 echo "[async]"
                 echo "rq = redis://127.0.0.1:6379/1"
-        } > /workspace/conf/trytond.conf
+        } > /workspace/drone/conf/trytond.conf
 }
 
 _link_modules() {
-        find /workspace/trytond/trytond/modules -type l -delete
-        ln -sf "/workspace/trytond-modules/modules/"* . || return 1
+        find /workspace/drone/trytond/trytond/modules -type l -delete
+        ln -sf "/workspace/drone/trytond-modules/modules/"* . || return 1
         ln -sf "/workspace/drone/coog/modules/"* . || return 1
         [ "$DRONE_REPO_NAME" == "customers" ] && ln -sf "/workspace/drone/customers/modules" . || return 0
 }
 
 link_modules() {
-        (cd /workspace/trytond/trytond/modules && _link_modules)
+        (cd /workspace/drone/trytond/trytond/modules && _link_modules)
 }
 
 main() {
