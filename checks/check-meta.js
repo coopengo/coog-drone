@@ -263,6 +263,9 @@ const main = () => {
               result.content = err.message
               print(result)
             })
+        } else {
+          print(result)
+          console.log('CONTENT FORCED. Skipping other tests.')
         }
     }
     
