@@ -44,8 +44,7 @@ const getLabels = (json) => {
 
 const checkTitle = (json) => {
   const title = json.title
-  return
-    title.includes(': ')
+  return !title.includes(': ')
       ? 'Title should be "<module>: <short title>"'
       : title.slice(-3) === '…'
         ? 'Title should not end with "…"'
@@ -204,13 +203,17 @@ const capitalize = (word) => {
   return word.charAt(0).toUpperCase() + word.slice(1)
 }
 
+const formatLength = (string, l) => {
+  return (string + ' '.repeat(l)).slice(0, l)
+}
+
 const print = (res) => {
   const keys = Object.keys(res)
   let reject = false
 
   keys.forEach((key) => {
-    const msg = res[key] === true ? 'Ok   ✔' : `${res[key]}   ✖`
-    console.log(`  > ${capitalize(key)}     --> ${msg}`)
+    const msg = res[key] === true ? 'Ok   ✔' : `${formatLength(res[key], 50)}   ✖`
+    console.log(`  > ${formatLength(capitalize(key), 10)}     --> ${msg}`)
 
     if (res[key] !== true) reject = true
   })
@@ -267,7 +270,7 @@ const main = () => {
     }
     
   }).catch((err) => {
-    console.log(err.message)
+    console.log(err)
     process.exit(1)
   })
 }
