@@ -1,51 +1,50 @@
 #!/bin/sh
 
+. /workspace/drone/tests/checks/utils
+
 init_bin() {
-        ln -s /workspace/drone/tryton/bin/trytond /usr/local/bin/trytond
-        ln -s /workspace/drone/trytond/bin/trytond-admin /usr/local/bin/trytond-admin
+    ln -s /workspace/drone/tryton/bin/trytond /usr/local/bin/trytond
+    ln -s /workspace/drone/trytond/bin/trytond-admin /usr/local/bin/trytond-admin
 }
 
 init_conf() {
-        {
-                echo "[database]"
-                echo "uri = postgresql://postgres:postgres@database:5432"
-                echo "[env]"
-                echo "testing = True"
-                echo "[async]"
-                echo "rq = redis://127.0.0.1:6379/1"
-        } > /workspace/drone/conf/trytond.conf
+    {
+        echo "[database]"
+        echo "uri = postgresql://postgres:postgres@database:5432"
+        echo "[env]"
+        echo "testing = True"
+        echo "[async]"
+        echo "rq = redis://127.0.0.1:6379/1"
+    } > /workspace/drone/conf/trytond.conf
 }
 
 _link_modules() {
-        find /workspace/drone/trytond/trytond/modules -type l -delete
-        ln -s "/workspace/drone/trytond-modules/modules/"* . || return 1
-        ln -s "/workspace/drone/coog/modules/"* . || return 1
-        [ "$DRONE_REPO_NAME" == "customers" ] && ln -s "/workspace/drone/customers/modules" . || return 1
+    find /workspace/drone/trytond/trytond/modules -type l -delete
+    ln -s "/workspace/drone/trytond-modules/modules/"* . || return 1
+    ln -s "/workspace/drone/coog/modules/"* . || return 1
+    [ "$DRONE_REPO_NAME" = "customers" ] && ln -s "/workspace/drone/customers/modules" . || return 1
 }
 
 link_modules() {
-        (cd /workspace/drone/trytond/trytond/modules && _link_modules)
+    (cd /workspace/drone/trytond/trytond/modules && _link_modules)
 }
 
 test_modules() {
-        unset DB_NAME
-        unset TRYTOND_CACHE_CLASS
-        local module
-        for module in $(get_modules)
-        do
-                echo "----------------------------"
-                echo "Testing $module..."
-                echo "----------------------------"
-                LOG_LEVEL=DEBUG python -W ignore /workspace/drone/trytond/trytond/tests/run-tests.py \
-                      -c /workspace/drone/conf/trytond.conf -vv -m $module
-        done
+    unset DB_NAME
+    unset TRYTOND_CACHE_CLASS
+    local module
+    for module in $(get_modules)
+    do
+        echo "----------------------------"
+        echo "Testing $module..."
+        echo "----------------------------"
+        LOG_LEVEL=DEBUG python -W ignore /workspace/drone/trytond/trytond/tests/run-tests.py \
+            -c /workspace/drone/conf/trytond.conf -vv -m "$module"
+    done
 }
 
 main() {
-        source /workspace/drone/tests/checks/utils  # get_modules
-
-        mkdir /workspace/drone/conf
-
+    mkdir /workspace/drone/conf \
         && init_bin \
         && init_conf \
         && link_modules \
