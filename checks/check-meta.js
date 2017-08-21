@@ -230,9 +230,10 @@ const main = () => {
     const arg = process.argv[2]
 
     if (arg === 'tests') {
-      process.exit(1)
+      labels.includes('bypass tests check')
+        ? console.log('TESTS FORCED')
+        : process.exit(1)
     } else {
-      if (!labels.includes('bypass tests check')) {
         if (!labels.includes('bypass title check')) {
           result.title = checkTitle(process.RAW_JSON) || true
         }
@@ -263,10 +264,6 @@ const main = () => {
               print(result)
             })
         }
-        
-      } else {
-        console.log('TESTS FORCED.')
-      }
     }
     
   }).catch((err) => {
