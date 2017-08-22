@@ -212,7 +212,7 @@ const print = (res) => {
   let reject = false
 
   keys.forEach((key) => {
-    const msg = res[key] === true ? 'Ok   ✔' : `${formatLength(res[key], 50)}   ✖`
+    const msg = res[key] === true ? `${formatLength('Ok', 50)}   ✔` : `${formatLength(res[key], 50)}   ✖`
     console.log(`  > ${formatLength(capitalize(key), 10)}     --> ${msg}`)
 
     if (res[key] !== true) reject = true
