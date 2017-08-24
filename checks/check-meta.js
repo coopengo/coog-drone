@@ -108,9 +108,6 @@ const checkLabels = (json, labels) => {
       if (!ALLOWED_PROJECTS[json.base.repo.full_name].map((x) => { return x[0] }).includes(issue.project.id)) {
         reject(new Error(`Bad project for issue ${ref.issue}.`))
       }
-      if ((labels.includes('bug') && !labels.includes('cherry checked')) === true) {
-        reject(new Error('Missing cherry check.'))
-      }
 
       resolve(true)
     }).catch((err) => {
@@ -180,7 +177,7 @@ const checkContents = (json, labels) => {
           if (filename.includes('CHANGELOG')) {
             console.log(`CHANGELOG file detected in ${filename}.`)
 
-            const logs = patch.split('\n').filter((log) => { return log.includes('* FEA#') || log.includes('* BUG#') || log.includes('* OTH:') })
+            const logs = patch.split('\n').filter((log) => { return log.includes('* FEA#') || log.includes('* BUG#') || log.includes('* OTH#') })
 
             if (logs.length === 0) reject(new Error('Malformed logs. No FEA, BUG or OTH detected in CHANGELOG.'))
 
@@ -256,6 +253,7 @@ const main = () => {
                   })
               } else {
                 console.log('Ignoring labels and body check as the issue is OTH type.')
+                result.content = true
                 print(result)
               }
             })
