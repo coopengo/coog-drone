@@ -90,11 +90,9 @@ const checkLabels = (json, labels) => {
     }).then(({data}) => {
       const issue = data.issue
 
-
       labels.includes('bug') && labels.includes('enhancement')
         ? reject(new Error('Cannot have both "bug" and "enhancement" label'))
-        : !labels.includes('bug') || !labels.includes('enhancement') && reject(new Error('No bug or enhancement labels found'))
-
+        : !labels.includes('bug') && !labels.includes('enhancement') && reject(new Error('No bug or enhancement labels found'))
 
       if (labels.includes('bug')) {
         if (ref.type === 'Fix' && !issue.tracker.id === 1) {
