@@ -20,10 +20,6 @@ const githubParams = {
   }
 }
 
-const _throw = (msg) => {
-  throw new Error(msg)
-}
-
 const getData = () => {
   return new Promise((resolve, reject) => {
     axios.get(githubUri, githubParams).then(({data}) => {
@@ -230,12 +226,12 @@ const main = () => {
         ? console.log('TESTS FORCED')
         : process.exit(1)
     } else {
-        if (!labels.includes('bypass title check')) {
-          result.title = checkTitle(process.RAW_JSON) || true
-        }
+      if (!labels.includes('bypass title check')) {
+        result.title = checkTitle(process.RAW_JSON) || true
+      }
 
-        if (!labels.includes('bypass content check')) {
-          checkContents(process.RAW_JSON, labels)
+      if (!labels.includes('bypass content check')) {
+        checkContents(process.RAW_JSON, labels)
             .then((res) => {
               result.content = res
               if (res) {
@@ -260,12 +256,11 @@ const main = () => {
               result.content = err.message
               print(result)
             })
-        } else {
-          print(result)
-          console.log('CONTENT FORCED. Skipping other tests.')
-        }
+      } else {
+        print(result)
+        console.log('CONTENT FORCED. Skipping other tests.')
+      }
     }
-    
   }).catch((err) => {
     console.log(err)
     process.exit(1)
