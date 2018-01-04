@@ -1,0 +1,2 @@
+- publish an image per version
+- add checks in Docker images, publish to github and auto build image on dockerhub

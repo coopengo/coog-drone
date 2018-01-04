@@ -1,14 +1,13 @@
+# vim: ft=sh ts=4 sw=4 et
+
 get_modules() {
-        if [ "$DRONE_REPO_NAME" == "coog" ]
-        then
-                cd /workspace/drone/coog \
-                && git fetch origin master \
-                && git diff --name-only $(git merge-base origin/"$DRONE_BRANCH" "$DRONE_COMMIT_SHA") "$DRONE_COMMIT_SHA" \
-                | grep "^modules" \
-                | cut -d "/" -f 2 \
-                | sort \
-                | uniq
-        else
-                [ -d /workspace/drone/customers/modules ] && ls -1 /workspace/drone/customers/modules
-        fi
+    if [ "$DRONE_REPO_NAME" = coog ]
+    then
+        cd /workspace/drone/coog &&
+            git fetch origin &&
+            git diff --name-only $(git merge-base origin/"$DRONE_BRANCH" "$DRONE_COMMIT_SHA") "$DRONE_COMMIT_SHA" |
+            grep "^modules" | cut -d "/" -f 2 | sort | uniq
+    else
+        [ -d /workspace/drone/customers/modules ] && ls -1 /workspace/drone/customers/modules
+    fi
 }
