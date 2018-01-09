@@ -1,23 +1,23 @@
 #!/bin/sh
 # vim: ft=sh ts=4 sw=4 et
 
-. /workspace/drone/tests/checks/utils
+check_module() {
+    echo "Check module $1"
+    flake8 --config=/workspace/drone/coog/tox.ini \
+        "/workspace/drone/coog/modules/$1"
+}
 
 main() {
-    local errors;
-    local modules; modules=$(get_modules)
-
+    local modules
+    modules=$(/workspace/drone/tests/checks/utils/modules.py 2>&1)
+    [ $? -ne 0 ] && echo "$modules" && return 1
+    local ret=0
     for module in $modules
     do
-        errors=$(flake8 --config=/workspace/drone/coog/tox.ini "/workspace/drone/coog/modules/$module")
-
-        if [ ${#errors} -eq 0 ]
-        then
-            echo "No flake8 error detected, good job!"
-        else
-            echo "$errors" && return 1
-        fi
+        check_module "$module"
+        [ $? -ne 0 ] && ret=1
     done
+    return "$ret"
 }
 
 main

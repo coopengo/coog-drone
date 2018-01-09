@@ -1,14 +1,14 @@
 #!/bin/sh
 # vim: ft=sh ts=4 sw=4 et
 
-. /workspace/drone/tests/checks/utils
-
 init_bin() {
+    echo "1. Init bin"
     ln -s /workspace/drone/tryton/bin/trytond /usr/local/bin/trytond
     ln -s /workspace/drone/trytond/bin/trytond-admin /usr/local/bin/trytond-admin
 }
 
 init_conf() {
+    echo "2. Init conf"
     {
         echo "[database]"
         echo "uri = postgresql://postgres:postgres@database:5432"
@@ -23,33 +23,48 @@ _link_modules() {
     find /workspace/drone/trytond/trytond/modules -type l -delete
     ln -s "/workspace/drone/trytond-modules/modules/"* . || return 1
     ln -s "/workspace/drone/coog/modules/"* . || return 1
-    [ "$DRONE_REPO_NAME" = "customers" ] && ln -s "/workspace/drone/customers/modules" . || return 1
+    if [ "$DRONE_REPO_NAME" = "customers" ]
+    then
+        ln -s "/workspace/drone/customers/modules" . || return 1
+    else
+        return 0
+    fi
 }
 
 link_modules() {
+    echo "3. Link modules"
     (cd /workspace/drone/trytond/trytond/modules && _link_modules)
 }
 
-test_modules() {
+check_module() {
+    echo "Test $1"
+    LOG_LEVEL=DEBUG python -W ignore \
+        /workspace/drone/trytond/trytond/tests/run-tests.py \
+        -c /workspace/drone/conf/trytond.conf -vv -m "$1"
+}
+
+check_modules() {
+    echo "4. Test modules"
     unset DB_NAME
     unset TRYTOND_CACHE_CLASS
-    local module
-    for module in $(get_modules)
+    local modules
+    modules=$(/workspace/drone/tests/checks/utils/modules.py 2>&1)
+    [ $? -ne 0 ] && echo "$modules" && return 1
+    local ret; ret=0
+    for module in $modules
     do
-        echo "----------------------------"
-        echo "Testing $module..."
-        echo "----------------------------"
-        LOG_LEVEL=DEBUG python -W ignore /workspace/drone/trytond/trytond/tests/run-tests.py \
-            -c /workspace/drone/conf/trytond.conf -vv -m "$module"
+        check_module "$module"
+        [ $? -ne 0 ] && ret=1
     done
+    return $ret
 }
 
 main() {
-    mkdir /workspace/drone/conf \
-        && init_bin \
-        && init_conf \
-        && link_modules \
-        && test_modules
+    mkdir /workspace/drone/conf &&
+        init_bin &&
+        init_conf &&
+        link_modules &&
+        check_modules
 }
 
 main

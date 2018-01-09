@@ -2,18 +2,16 @@
 # vim: ft=sh ts=4 sw=4 et
 
 main() {
-    local branch; branch="$DRONE_BRANCH"
-
+    local branch
+    branch="$DRONE_BRANCH"
     if [ "$DRONE_REPO_NAME" = "customers" ]
     then
         echo "$DRONE_BRANCH" | grep -qE "[a-z]+$"
-
         if [ $? -eq 0 ]
         then
             branch="master"
         else
-            echo "$DRONE_BRANCH" | grep -qE "coog-1\.(10|12|14)"
-
+            echo "$DRONE_BRANCH" | grep -qE "coog-1\.(12|14)"
             if [ $? -eq 0 ]
             then
                 branch=$(echo "$DRONE_BRANCH" | cut -d "-" -f 2,3)
@@ -25,9 +23,7 @@ main() {
         echo "Coog branch/version will be $branch."
 
         git clone -b "$branch" --depth=1 https://github.com/coopengo/coog /workspace/drone/coog
-
-
-        [ ! -d /workspace/drone/customers/modules ] && exit 0
+        [ ! -d /workspace/drone/customers/modules ] && return 0
     fi
 
     git clone --depth=1 --recursive --branch "$branch" https://github.com/coopengo/trytond.git /workspace/drone/trytond &&
