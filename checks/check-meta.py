@@ -110,26 +110,29 @@ def _check_content_changelog_line(label, line):
     ok = True
     m = changelog_regexp.match(line)
     if m:
-        global rm_issue_type
         issue_type = m.group(1).lower()
-        if rm_issue_type and rm_issue_type != issue_type:
-            ok = False
-            print('content:ko:changelog:{}:issue_type:{}{}'.format(
-                label, rm_issue_type, issue_type))
-        else:
-            if issue_type in ['bug', 'fea']:
+        if issue_type != 'oth':
+            global rm_issue_type
+            if rm_issue_type and rm_issue_type != issue_type:
+                ok = False
+                print('content:ko:changelog:{}:issue_type:{}{}'.format(
+                    label, rm_issue_type, issue_type))
+            else:
                 rm_issue_type = issue_type
                 print('content:ok:changelog:{}:issue_type:{}'.format(
                     label, issue_type))
-        global rm_issue
-        issue = int(m.group(2))
-        if rm_issue and rm_issue != issue:
-            ok = False
-            print('content:ko:changelog:{}:issue:{}-{}'.format(
-                label, issue, rm_issue))
+            issue = int(m.group(2))
+            global rm_issue
+            if rm_issue and rm_issue != issue:
+                ok = False
+                print('content:ko:changelog:{}:issue:{}-{}'.format(
+                    label, issue, rm_issue))
+            else:
+                rm_issue = issue
+                print('content:ok:changelog:{}:issue:{}'.format(label, issue))
         else:
-            rm_issue = issue
-            print('content:ok:changelog:{}:issue:{}'.format(label, issue))
+            print('content:ko:changelog:{}:issue_type:{}'.format(
+                    label, issue_type))
     else:
         ok = False
         print('content:ko:changelog:{}:{}'.format(label, line))
