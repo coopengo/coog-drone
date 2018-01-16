@@ -208,7 +208,7 @@ def main():
         else:
             sys.exit(1)
     ok = True
-    ok = check_labels and ok
+    ok = check_labels() and ok
     ok = check_title() and ok
     ok = check_body() and ok
     ok = check_content() and ok
