@@ -84,7 +84,7 @@ def check_title():
             print('title:ok')
         else:
             ok = False
-            print('title:ko')
+            print('title:ko:{}'.format(gh_pull['title']))
     return ok
 
 
@@ -102,7 +102,7 @@ def check_body():
             rm_issue = issue
     else:
         ok = False
-        print('body:ko')
+        print('body:ko:{}'.format(gh_pull['body']))
     return ok
 
 
