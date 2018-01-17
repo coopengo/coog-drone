@@ -19,7 +19,7 @@ RM_URL = 'https://support.coopengo.com/issues/{issue}.json'
 RM_HEADERS = {'X-Redmine-API-Key': RM_TOKEN}
 
 title_regexp = re.compile('\w+: .+')
-body_regexp = re.compile('(fix|ref) #(\d+)', re.M | re.I)
+body_regexp = re.compile('.*(fix|ref) #(\d+)', re.M | re.I | re.S)
 changelog_regexp = re.compile('\* (BUG|FEA|OTH)#(\d+)')
 
 rm_trackers = {1: 'bug', 2: 'fea'}
@@ -84,7 +84,7 @@ def check_title():
             print('title:ok')
         else:
             ok = False
-            print('title:ko:{}'.format(gh_pull['title']))
+            print('title:ko')
     return ok
 
 
@@ -102,7 +102,7 @@ def check_body():
             rm_issue = issue
     else:
         ok = False
-        print('body:ko:{}'.format(gh_pull['body']))
+        print('body:ko')
     return ok
 
 
