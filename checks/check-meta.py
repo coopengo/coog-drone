@@ -156,7 +156,7 @@ def check_content():
                     line[1:].strip()
                     for line in patch.splitlines()
                     if line.startswith('+')]
-                if len(lines) == 1:
+                if lines:
                     if not _check_content_changelog_line(label, lines[0]):
                         ok = False
                 else:
