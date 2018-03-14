@@ -23,6 +23,7 @@ body_regexp = re.compile('.*(fix|ref) #(\d+)', re.M | re.I | re.S)
 changelog_regexp = re.compile('\* (BUG|FEA|OTH)#(\d+)')
 
 rm_trackers = {1: 'bug', 2: 'fea'}
+issues_projects = [1, 31]
 
 gh_pull = None
 gh_issue = None
@@ -188,6 +189,14 @@ def check_redmine():
                 ok = False
                 print('redmine:ko:issue_type:{}-{}'.format(
                     issue_type, rm_issue_type))
+            issue_project = issue['project']['id']
+            if issue_project in issues_projects:
+                print('redmine:ok:issue_project:{}'.format(
+                    issue['project']['name']))
+            else:
+                ok = False
+                print('redmine:ko:issue_project:{}'.format(
+                    issue['project']['name']))
         else:
             ok = False
             print('redmine:ko:issue_type:empty')
