@@ -223,7 +223,10 @@ def main():
     ok = check_content() and ok
     ok = check_redmine() and ok
     if not ok:
-        sys.exit(1)
+        if 'bypass meta check' in gh_labels:
+            print('meta:bypass')
+        else:
+            sys.exit(1)
 
 
 if __name__ == '__main__':
