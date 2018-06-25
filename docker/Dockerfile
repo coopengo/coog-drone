@@ -49,6 +49,7 @@ RUN apk add --no-cache --virtual .build-deps \
         pytest \
         flake8 \
         celery \
+        ipaddress \
     && apk del .build-deps
 
 RUN git config --system url.https://github.com/.insteadOf git@github.com:
