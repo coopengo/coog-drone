@@ -50,6 +50,7 @@ RUN apk add --no-cache --virtual .build-deps \
         flake8 \
         celery \
         ipaddress \
+        python-magic \
     && apk del .build-deps
 
 RUN git config --system url.https://github.com/.insteadOf git@github.com:
