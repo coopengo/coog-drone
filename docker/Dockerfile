@@ -18,6 +18,7 @@ RUN apk add --no-cache --virtual .build-deps \
         linux-headers \
         musl-dev \
         python2-dev \
+        libmagic \
         \
     && pip install \
         requests \
