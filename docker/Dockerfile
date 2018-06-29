@@ -7,9 +7,7 @@ RUN apk add --no-cache\
     py2-pip \
     py2-lxml \
     py2-psycopg2 \
-    ack \
-    libmagic1
-    
+    ack
 
 RUN apk add --no-cache --virtual .build-deps \
         wget \
