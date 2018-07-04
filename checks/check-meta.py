@@ -132,7 +132,7 @@ def _check_content_changelog_line(label, line):
                 rm_issue = issue
                 print('content:ok:changelog:{}:issue:{}'.format(label, issue))
         else:
-            print('content:ko:changelog:{}:issue_type:{}'.format(
+            print('content:ok:changelog:{}:issue_type:{}'.format(
                     label, issue_type))
     else:
         ok = False
