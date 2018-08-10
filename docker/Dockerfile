@@ -52,6 +52,7 @@ RUN apk add --no-cache --virtual .build-deps \
         celery \
         ipaddress \
         python-magic \
+        phonenumbers \
     && apk del .build-deps
 
 RUN git config --system url.https://github.com/.insteadOf git@github.com:
