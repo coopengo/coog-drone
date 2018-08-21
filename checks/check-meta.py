@@ -95,7 +95,7 @@ def check_body():
     if m:
         issue = int(m.group(2))
         global rm_issue
-        if rm_issue and issue != rm_issue:
+        if issue and rm_issue and issue != rm_issue:
             ok = False
             print('body:ko:issue:{}-{}'.format(issue, rm_issue))
         else:
