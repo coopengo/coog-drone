@@ -173,7 +173,7 @@ def check_content():
 def check_redmine():
     ok = True
     global rm_issue, rm_issue_type
-    if rm_issue:
+    if rm_issue is not None:
         url = RM_URL.format(issue=rm_issue)
         r = requests.get(url, headers=RM_HEADERS)
         if r.status_code < 200 or r.status_code > 300:
