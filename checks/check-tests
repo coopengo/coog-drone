@@ -38,9 +38,11 @@ link_modules() {
 
 check_module() {
     echo "Test $1"
-    LOG_LEVEL=DEBUG python -W ignore \
-        /workspace/drone/trytond/trytond/tests/run-tests.py \
-        -c /workspace/drone/conf/trytond.conf -vv -m "$1"
+    if [ ! "$1" = "global_tests" ]; then
+        LOG_LEVEL=DEBUG python -W ignore \
+            /workspace/drone/trytond/trytond/tests/run-tests.py \
+            -c /workspace/drone/conf/trytond.conf -vv -m "$1"
+    fi
 }
 
 check_modules() {
@@ -53,11 +55,8 @@ check_modules() {
     local ret; ret=0
     for module in $modules
     do
-        # global_tests is too long for drone to handle
-        if [ "$module" = "global_tests" ]; then
-            check_module "$module"
-            [ $? -ne 0 ] && ret=1
-        fi
+        check_module "$module"
+        [ $? -ne 0 ] && ret=1
     done
     return $ret
 }
