@@ -42,6 +42,8 @@ check_module() {
         LOG_LEVEL=DEBUG python -W ignore \
             /workspace/drone/trytond/trytond/tests/run-tests.py \
             -c /workspace/drone/conf/trytond.conf -vv -m "$1"
+    else
+        echo "    global_tests bypassed for performance reason"
     fi
 }
 
