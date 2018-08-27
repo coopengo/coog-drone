@@ -23,7 +23,7 @@ body_regexp = re.compile('.*(fix|ref) #(\d+)', re.M | re.I | re.S)
 changelog_regexp = re.compile('\* (BUG|FEA|OTH)#(\d+)')
 
 rm_trackers = {1: 'bug', 2: 'fea'}
-issues_projects = [1, 31]
+issues_projects = [1, 31, 37]
 
 gh_pull = None
 gh_issue = None
