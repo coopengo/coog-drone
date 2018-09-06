@@ -178,7 +178,7 @@ def check_redmine():
         r = requests.get(url, headers=RM_HEADERS)
         if r.status_code < 200 or r.status_code > 300:
             print('error:rm:{}:{}:{}'.format(url, r.status_code, r.text))
-            sys.exit(1)
+            return False
         issue = r.json()['issue']
         print('redmine:ok:issue:{}'.format(issue['id']))
         if rm_issue_type:
