@@ -18,6 +18,7 @@ services:
       - DRONE_SECRET=${TEST_DRONE_SECRET}
       - DRONE_HOST=http://drone.coopengo.com
       - DRONE_LETS_ENCRYPT=true
+      - DRONE_GITHUB_MERGE_REF=false
     ports:
       - "80:80"
       - "443:443"
