@@ -1,10 +1,12 @@
 # Drone
+
 ## Install drone server
+
 1. First install [`docker`](https://docs.docker.com/get-started/) and [`docker-compose`](https://docs.docker.com/compose/gettingstarted/) on your server.
 2. Move this `drone` directory anywhere on your server.
 3. Build the image needed to run tests:
 ```
-/path/to/drone/images/base/build.sh
+docker build -t coog-test/base-tests docker
 ```
 4. [Make your application recognized by Github so you can have Github tokens.](https://github.com/settings/applications/new)
 5. Then export the following variables (put them into the /.bashrc file might be wise enough):
