@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # vim: ft=python ts=4 sw=4 et
 
 import os
@@ -36,7 +36,7 @@ def set_gh_pull():
     url = GH_URL_PULL.format(repo=REPO, pr=PR)
     r = requests.get(url, headers=GH_HEADERS)
     if r.status_code < 200 or r.status_code > 300:
-        print('error:gh:{}:{}:{}'.format(url, r.status_code, r.text))
+        print(('error:gh:{}:{}:{}'.format(url, r.status_code, r.text)))
         sys.exit(1)
     global gh_pull
     gh_pull = r.json()
@@ -46,7 +46,7 @@ def set_gh_issue():
     url = GH_URL_ISSUE.format(repo=REPO, pr=PR)
     r = requests.get(url, headers=GH_HEADERS)
     if r.status_code < 200 or r.status_code > 300:
-        print('error:gh:{}:{}:{}'.format(url, r.status_code, r.text))
+        print(('error:gh:{}:{}:{}'.format(url, r.status_code, r.text)))
         sys.exit(1)
     global gh_issue
     gh_issue = r.json()
@@ -61,7 +61,7 @@ def get_gh_files():
     url = (GH_URL_PULL + '/files').format(repo=REPO, pr=PR)
     r = requests.get(url, headers=GH_HEADERS)
     if r.status_code < 200 or r.status_code > 300:
-        print('error:gh:{}:{}:{}'.format(url, r.status_code, r.text))
+        print(('error:gh:{}:{}:{}'.format(url, r.status_code, r.text)))
         sys.exit(1)
     return r.json()
 
@@ -97,9 +97,9 @@ def check_body():
         global rm_issue
         if issue and rm_issue and issue != rm_issue:
             ok = False
-            print('body:ko:issue:{}-{}'.format(issue, rm_issue))
+            print(('body:ko:issue:{}-{}'.format(issue, rm_issue)))
         else:
-            print('body:ok:issue:{}'.format(issue))
+            print(('body:ok:issue:{}'.format(issue)))
             rm_issue = issue
     else:
         ok = False
@@ -116,27 +116,27 @@ def _check_content_changelog_line(label, line):
             global rm_issue_type
             if rm_issue_type and rm_issue_type != issue_type:
                 ok = False
-                print('content:ko:changelog:{}:issue_type:{}{}'.format(
-                    label, rm_issue_type, issue_type))
+                print(('content:ko:changelog:{}:issue_type:{}{}'.format(
+                    label, rm_issue_type, issue_type)))
             else:
                 rm_issue_type = issue_type
-                print('content:ok:changelog:{}:issue_type:{}'.format(
-                    label, issue_type))
+                print(('content:ok:changelog:{}:issue_type:{}'.format(
+                    label, issue_type)))
             issue = int(m.group(2))
             global rm_issue
             if rm_issue and rm_issue != issue:
                 ok = False
-                print('content:ko:changelog:{}:issue:{}-{}'.format(
-                    label, issue, rm_issue))
+                print(('content:ko:changelog:{}:issue:{}-{}'.format(
+                    label, issue, rm_issue)))
             else:
                 rm_issue = issue
-                print('content:ok:changelog:{}:issue:{}'.format(label, issue))
+                print(('content:ok:changelog:{}:issue:{}'.format(label, issue)))
         else:
-            print('content:ok:changelog:{}:issue_type:{}'.format(
-                    label, issue_type))
+            print(('content:ok:changelog:{}:issue_type:{}'.format(
+                    label, issue_type)))
     else:
         ok = False
-        print('content:ko:changelog:{}:{}'.format(label, line))
+        print(('content:ko:changelog:{}:{}'.format(label, line)))
     return ok
 
 
@@ -162,8 +162,8 @@ def check_content():
                         ok = False
                 else:
                     ok = False
-                    print('content:ko:changelog:{}'.format(
-                        changelog['filename']))
+                    print(('content:ko:changelog:{}'.format(
+                        changelog['filename'])))
         else:
             ok = False
             print('content:ko:changelog')
@@ -177,26 +177,26 @@ def check_redmine():
         url = RM_URL.format(issue=rm_issue)
         r = requests.get(url, headers=RM_HEADERS)
         if r.status_code < 200 or r.status_code > 300:
-            print('error:rm:{}:{}:{}'.format(url, r.status_code, r.text))
+            print(('error:rm:{}:{}:{}'.format(url, r.status_code, r.text)))
             return False
         issue = r.json()['issue']
-        print('redmine:ok:issue:{}'.format(issue['id']))
+        print(('redmine:ok:issue:{}'.format(issue['id'])))
         if rm_issue_type:
             issue_type = rm_trackers[issue['tracker']['id']]
             if issue_type == rm_issue_type:
-                print('redmine:ok:issue_type:{}'.format(issue_type))
+                print(('redmine:ok:issue_type:{}'.format(issue_type)))
             else:
                 ok = False
-                print('redmine:ko:issue_type:{}-{}'.format(
-                    issue_type, rm_issue_type))
+                print(('redmine:ko:issue_type:{}-{}'.format(
+                    issue_type, rm_issue_type)))
             issue_project = issue['project']['id']
             if issue_project in issues_projects:
-                print('redmine:ok:issue_project:{}'.format(
-                    issue['project']['name']))
+                print(('redmine:ok:issue_project:{}'.format(
+                    issue['project']['name'])))
             else:
                 ok = False
-                print('redmine:ko:issue_project:{}'.format(
-                    issue['project']['name']))
+                print(('redmine:ko:issue_project:{}'.format(
+                    issue['project']['name'])))
         else:
             ok = False
             print('redmine:ko:issue_type:empty')
