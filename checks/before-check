@@ -27,8 +27,8 @@ main() {
     fi
 
     git clone --depth=1 --recursive --branch "$branch" https://github.com/coopengo/trytond.git /workspace/drone/trytond &&
-        git clone --depth=1 --recursive --branch "$branch" https://github.com/coopengo/trytond-modules.git /workspace/drone/trytond-modules &&
-        git clone --depth=1 --recursive --branch "$branch" https://github.com/coopengo/proteus.git /workspace/drone/proteus
+    git clone --depth=1 --recursive --branch "$branch" https://github.com/coopengo/trytond-modules.git /workspace/drone/trytond-modules &&
+    git clone --depth=1 --recursive --branch "$branch" https://github.com/coopengo/proteus.git /workspace/drone/proteus
 }
 
 main
