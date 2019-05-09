@@ -24,7 +24,7 @@ RUN apk add --no-cache \
         "intervaltree" \
         "filelock" \
         "wrapt" \
-        "werkzeug" \
+        "werkzeug<0.15" \
         "simpleeval" \
         "ldap3" \
         "requests" \
