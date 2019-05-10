@@ -1,0 +1,61 @@
+FROM alpine:3.7
+MAINTAINER Coopengo <support@coopengo.com>
+
+RUN apk add --no-cache\
+    git \
+    python2 \
+    postgresql \
+    py2-pip \
+    py2-lxml \
+    py2-psycopg2 \
+    libmagic \
+    ack
+
+RUN apk add --no-cache --virtual .build-deps \
+        wget \
+        ca-certificates \
+        make \
+        gcc \
+        g++ \
+        linux-headers \
+        musl-dev \
+        python2-dev \
+        libmagic \
+        \
+    && pip install \
+        requests \
+        werkzeug \
+        wrapt \
+        ldap3 \
+        pyflakes \
+        dateutils \
+        num2words \
+        python-sql \
+        polib \
+        Genshi \
+        relatorio \
+        pydot \
+        pyparsing \
+        python-stdnum \
+        unidecode \
+        intervaltree \
+        filelock \
+        simpleeval \
+        rq \
+        redis \
+        hiredis \
+        msgpack-python \
+        argcomplete \
+        Mock \
+        chardet \
+        vobject \
+        pytest \
+        flake8 \
+        celery \
+        ipaddress \
+        python-magic \
+        phonenumbers \
+    && apk del .build-deps
+
+RUN git config --system url.https://github.com/.insteadOf git@github.com:
+RUN mkdir /workspace/ /workspace/drone/ /workspace/drone/conf /workspace/drone/tmp
