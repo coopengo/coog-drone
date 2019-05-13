@@ -36,7 +36,6 @@ RUN apk add --no-cache \
         "mock" \
         "phonenumbers" \
         "passlib" \
-        "colored" \
     && rm -rf /root/.cache \
     && find / -name "__pycache__" -prune -exec rm -rf {} \;
 
