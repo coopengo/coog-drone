@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # vim: ft=python ts=4 sw=4 et
 
 import os
