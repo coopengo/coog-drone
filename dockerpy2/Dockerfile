@@ -1,4 +1,3 @@
-
 FROM python:2-slim
 MAINTAINER Coopengo <support@coopengo.com>
 
