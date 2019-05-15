@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # vim: ft=python ts=4 sw=4 et
 
 import os
@@ -26,6 +26,7 @@ def main():
     modules = set(modules)
     for m in modules:
         print(m)
+
 
 
 if __name__ == '__main__':
