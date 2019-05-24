@@ -25,7 +25,7 @@ _link_modules() {
     ln -s "/workspace/drone/coog/modules/"* . || return 1
     if [ "$DRONE_REPO_NAME" = "customers" ]
     then
-        ln -s "/workspace/drone/customers/modules" . || return 1
+        ln -s "/workspace/drone/customers/modules/"* . || return 1
     else
         return 0
     fi
