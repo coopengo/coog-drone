@@ -15,7 +15,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN pip install \
-        "pyflakes==1.6.0" \
         "flake8==3.7.7" \
         "dateutils==0.6.6" \
         "num2words==0.5.5" \
