@@ -182,7 +182,7 @@ def check_files():
     issues = get_pull_request_body_issues()
 
     for f in get_gh_files():
-        if 'issues' in f['filename']:
+        if 'doc/issues' in f['filename']:
             gh_issues_files.append(f)
 
     # to test
