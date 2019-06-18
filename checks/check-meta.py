@@ -5,6 +5,7 @@ import os
 import re
 import sys
 import requests
+import base64
 
 REPO = os.environ['DRONE_REPO_NAME']
 PR = os.environ['DRONE_PULL_REQUEST']
@@ -50,6 +51,156 @@ def set_gh_issue():
         sys.exit(1)
     global gh_issue
     gh_issue = r.json()
+
+
+# pattern if bug
+bugStr = (
+    r"##(.*)\n+##(.*)\n+###([^#]*)###([^#]*)###([^#]*)###([^#]*)##([^#]*)##([^#]*)")
+
+# pattern if feature
+featureStr = (r"##(.*)\n+##(.*)\n+###([^#]*)###([^#]*)##([^#]*)##([^#]*)")
+
+bug_regexp = re.compile(bugStr)
+feature_regexp = re.compile(featureStr)
+
+
+def get_pull_request_body_issues():
+    body = gh_pull['body']
+    # Put the string in lowercase
+    body = body.lower()
+
+    # Create an array with each element of the pull body
+    pullBodyArray = body.split(" ")
+
+    issues = []
+    # If the pull body contains the word "fix"
+    if "fix" in pullBodyArray:
+        # We retrieve the fix number identified by '#'
+        for issueIDtemp in pullBodyArray:
+            if '#' in issueIDtemp:
+                issues.append(issueIDtemp.split('#')[1])
+        return issues
+    else:
+        print('Not for a fix')
+
+
+def check_file(contents_url, issueNumber):
+    ok = True
+    r = requests.get(contents_url, headers=GH_HEADERS)
+    r = r.json()
+    fileContent = base64.b64decode(r['content']).decode('utf-8')
+
+    url = RM_URL.format(issue=issueNumber)
+    r = requests.get(url, headers=RM_HEADERS)
+    if r.status_code < 200 or r.status_code > 300:
+        print(('error:rm:{}:{}:{}'.format(url, r.status_code, r.text)))
+        return False
+
+    tracker = r.json()['issue']['tracker']['name']
+
+    if tracker == "Bug":
+        m = bug_regexp.match(fileContent)
+
+        # if the file match the pattern, tags are respected
+        if m:
+            print('content:ok:bug')
+            title_en = m.group(1)
+            title_fr = m.group(2)
+            business_modules = m.group(5)
+            original_description = m.group(6)
+
+            if len(title_en) < 15:
+                ok = False
+                print('content :ko:title not specified')
+            else:
+                print('content :ok:title_en')
+
+            if len(title_fr) < 15:
+                ok = False
+                print('content :ko:title not specified')
+            else:
+                print('content :ok:title_fr')
+            if len(business_modules) < 40:
+                ok = False
+                print('content :ko:business_modules not specified')
+            else:
+                print('content :ok:business_modules')
+            if len(original_description) < 50:
+                ok = False
+                print('content :ko:original_description')
+            else:
+                print('content :ok:original_description')
+
+        else:
+            print('content :ko:tags not respected')
+            print(fileContent)
+            ok = False
+
+    elif tracker == "Feature":
+        m = feature_regexp.match(fileContent)
+
+        if m:
+            print('content tags:ok:fea')
+            title_en = m.group(1)
+            title_fr = m.group(3)
+            business_modules = m.group(9)
+            original_description = m.group(11)
+
+            if len(title_en) < 15:
+                ok = False
+                print('content :ko:title not specified')
+            else:
+                print('content :ok:title_en')
+
+            if len(title_fr) < 15:
+                ok = False
+                print('content :ko:title not specified')
+            else:
+                print('content :ok:title_fr')
+            if len(business_modules) < 40:
+                ok = False
+                print('content :ko:business_modules not specified')
+            else:
+                print('content :ok:business_modules')
+            if len(original_description) < 50:
+                ok = False
+                print('content :ko:original_description')
+            else:
+                print('content :ok:original_description')
+        else:
+            print('content tags:ko:fea')
+            ok = False
+
+    return ok
+
+
+def check_files():
+
+    ok = True
+    gh_issues_files = []
+
+    issues = get_pull_request_body_issues()
+
+    for f in get_gh_files():
+        if 'issues' in f['filename']:
+            gh_issues_files.append(f)
+
+    # to test
+    issues = ['11508', '1163']
+
+    for n in issues:
+        isInPr = False
+        for f in gh_issues_files:
+            if n in f['filename']:
+                isInPr = True
+                print('verif file {}'.format(f['filename']))
+                ok = check_file(f['contents_url'], n)
+
+        if not isInPr:
+            print('issues:ko:issue:{} not in files'.format(n))
+            ok = False
+
+    return ok
 
 
 def set_gh_labels():
@@ -133,7 +284,7 @@ def _check_content_changelog_line(label, line):
                 print(('content:ok:changelog:{}:issue:{}'.format(label, issue)))
         else:
             print(('content:ok:changelog:{}:issue_type:{}'.format(
-                    label, issue_type)))
+                label, issue_type)))
     else:
         ok = False
         print(('content:ko:changelog:{}:{}'.format(label, line)))
@@ -223,6 +374,8 @@ def main():
     ok = check_body() and ok
     ok = check_content() and ok
     ok = check_redmine() and ok
+    ok = check_files() and ok
+
     if not ok:
         if 'bypass meta check' in gh_labels:
             print('meta:bypass')
