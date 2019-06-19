@@ -55,7 +55,8 @@ def set_gh_issue():
 
 # pattern if bug
 bugStr = (
-    r"##(.*)\n+##(.*)\n+###([^#]*)###([^#]*)###([^#]*)###([^#]*)##([^#]*)##([^#]*)")
+    r"##(.*)\n+##(.*)\n+###([^#]*)###([^#]*)"
+    r"###([^#]*)###([^#]*)##([^#]*)##([^#]*)")
 
 # pattern if feature
 featureStr = (r"##(.*)\n+##(.*)\n+###([^#]*)###([^#]*)##([^#]*)##([^#]*)")
@@ -106,8 +107,8 @@ def check_file(contents_url, issueNumber):
             print('content:ok:bug')
             title_en = m.group(1)
             title_fr = m.group(2)
-            business_modules = m.group(5)
-            original_description = m.group(6)
+            business_modules = m.group(7)
+            original_description = m.group(8)
 
             if len(title_en) < 15:
                 ok = False
@@ -143,8 +144,8 @@ def check_file(contents_url, issueNumber):
             print('content tags:ok:fea')
             title_en = m.group(1)
             title_fr = m.group(3)
-            business_modules = m.group(9)
-            original_description = m.group(11)
+            business_modules = m.group(5)
+            original_description = m.group(6)
 
             if len(title_en) < 15:
                 ok = False
