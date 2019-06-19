@@ -185,9 +185,6 @@ def check_files():
         if 'doc/issues' in f['filename']:
             gh_issues_files.append(f)
 
-    # to test
-    issues = ['11508', '1163']
-
     for n in issues:
         isInPr = False
         for f in gh_issues_files:
