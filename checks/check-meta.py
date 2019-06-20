@@ -12,8 +12,8 @@ PR = os.environ['DRONE_PULL_REQUEST']
 GH_TOKEN = os.environ['GITHUB_TOKEN']
 RM_TOKEN = os.environ['REDMINE_TOKEN']
 
-GH_URL_PULL = 'https://api.github.com/repos/coopengo/{repo}/pulls/{pr}'
-GH_URL_ISSUE = 'https://api.github.com/repos/coopengo/{repo}/issues/{pr}'
+GH_URL_PULL = 'https://api.github.com/repos/MaxTeiger/{repo}/pulls/{pr}'
+GH_URL_ISSUE = 'https://api.github.com/repos/MaxTeiger/{repo}/issues/{pr}'
 GH_HEADERS = {'Authorization': 'Bearer {}'.format(GH_TOKEN)}
 
 RM_URL = 'https://support.coopengo.com/issues/{issue}.json'
@@ -55,16 +55,14 @@ def set_gh_issue():
 
 # pattern if bug
 bugStr = (
-    r"##(.*)\n+##(.*)\n+###((\n|.)*)###((\n|.)*)"
-    r"###((\n|.)*)###((\n|.)*)##((\n|.)*)##((\n|.)*)")
+    r"##(.*)\n+##(.*)\n+###(.*)###(.*)###(.*)###(.*)##(.*)##(.*)")
 
 # pattern if feature
 featureStr = (
-    r"##(.*)\n+##(.*)\n+###((\n|.)*)"
-    r"###((\n|.)*)##((\n|.)*)##((\n|.)*)")
+    r'##(.*)\n+##(.*)\n+###(.*)###(.*)##(.*)##(.*)')
 
-bug_regexp = re.compile(bugStr)
-feature_regexp = re.compile(featureStr)
+bug_regexp = re.compile(bugStr, re.S)
+feature_regexp = re.compile(featureStr, re.S)
 
 
 def get_pull_request_body_issues():
@@ -73,18 +71,18 @@ def get_pull_request_body_issues():
     body = body.lower()
 
     # Create an array with each element of the pull body
-    pullBodyArray = body.split(" ")
+    pullBodyArray = re.split(' |\n', body)
 
     issues = []
     # If the pull body contains the word "fix"
-    if "fix" in pullBodyArray:
+    if "ref" in pullBodyArray or "fix" in pullBodyArray:
         # We retrieve the fix number identified by '#'
         for issueIDtemp in pullBodyArray:
             if '#' in issueIDtemp:
                 issues.append(issueIDtemp.split('#')[1])
         return issues
     else:
-        print('Not for a fix')
+        print('Nether fix or ref in pull body')
         return issues
 
 
@@ -99,21 +97,20 @@ def check_file(contents_url, issueNumber):
     if r.status_code < 200 or r.status_code > 300:
         print(('error:rm:{}:{}:{}'.format(url, r.status_code, r.text)))
         return False
-
+    
     tracker = r.json()['issue']['tracker']['name']
 
     if tracker == "Bug":
         m = bug_regexp.match(fileContent)
-
         # if the file match the pattern, tags are respected
         if m:
             print('content:ok:bug')
             title_en = m.group(1)
             title_fr = m.group(2)
             repro=m.group(3)
-            correction=m.group(5)
-            business_modules = m.group(11)
-            original_description = m.group(13)
+            correction=m.group(4)
+            business_modules = m.group(7)
+            original_description = m.group(8)
 
             if len(title_en) < 15:
                 ok = False
@@ -138,19 +135,17 @@ def check_file(contents_url, issueNumber):
                 print('content :ok:original_description')
 
         else:
-            print('content :ko:tags not respected')
-            print(fileContent)
+            print('content :ko:bug')
             ok = False
 
     elif tracker == "Feature":
         m = feature_regexp.match(fileContent)
-
         if m:
             print('content tags:ok:fea')
             title_en = m.group(1)
-            title_fr = m.group(3)
-            business_modules = m.group(7)
-            original_description = m.group(9)
+            title_fr = m.group(2)
+            business_modules = m.group(5)
+            original_description = m.group(6)
 
             if len(title_en) < 15:
                 ok = False
@@ -194,15 +189,15 @@ def check_files():
     for n in issues:
         isInPr = False
         for f in gh_issues_files:
-            if n in f['filename']:
+            if n == f['filename'].split('/')[2].replace('.md', ''):
                 isInPr = True
                 print('verif file {}'.format(f['filename']))
-                ok = check_file(f['contents_url'], n)
+                ok = check_file(f['contents_url'], n) and ok
 
         if not isInPr:
             print('issues:ko:issue:{} not in files'.format(n))
             ok = False
-
+            
     return ok
 
 
