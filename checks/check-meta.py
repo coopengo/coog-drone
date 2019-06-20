@@ -55,11 +55,13 @@ def set_gh_issue():
 
 # pattern if bug
 bugStr = (
-    r"##(.*)\n+##(.*)\n+###([^#]*)###([^#]*)"
-    r"###([^#]*)###([^#]*)##([^#]*)##([^#]*)")
+    r"##(.*)\n+##(.*)\n+###((\n|.)*)###((\n|.)*)"
+    r"###((\n|.)*)###((\n|.)*)##((\n|.)*)##((\n|.)*)")
 
 # pattern if feature
-featureStr = (r"##(.*)\n+##(.*)\n+###([^#]*)###([^#]*)##([^#]*)##([^#]*)")
+featureStr = (
+    r"##(.*)\n+##(.*)\n+###((\n|.)*)"
+    r"###((\n|.)*)##((\n|.)*)##((\n|.)*)")
 
 bug_regexp = re.compile(bugStr)
 feature_regexp = re.compile(featureStr)
@@ -83,6 +85,7 @@ def get_pull_request_body_issues():
         return issues
     else:
         print('Not for a fix')
+        return issues
 
 
 def check_file(contents_url, issueNumber):
@@ -107,8 +110,10 @@ def check_file(contents_url, issueNumber):
             print('content:ok:bug')
             title_en = m.group(1)
             title_fr = m.group(2)
-            business_modules = m.group(7)
-            original_description = m.group(8)
+            repro=m.group(3)
+            correction=m.group(5)
+            business_modules = m.group(11)
+            original_description = m.group(13)
 
             if len(title_en) < 15:
                 ok = False
@@ -144,8 +149,8 @@ def check_file(contents_url, issueNumber):
             print('content tags:ok:fea')
             title_en = m.group(1)
             title_fr = m.group(3)
-            business_modules = m.group(5)
-            original_description = m.group(6)
+            business_modules = m.group(7)
+            original_description = m.group(9)
 
             if len(title_en) < 15:
                 ok = False
