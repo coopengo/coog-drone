@@ -12,8 +12,8 @@ PR = os.environ['DRONE_PULL_REQUEST']
 GH_TOKEN = os.environ['GITHUB_TOKEN']
 RM_TOKEN = os.environ['REDMINE_TOKEN']
 
-GH_URL_PULL = 'https://api.github.com/repos/MaxTeiger/{repo}/pulls/{pr}'
-GH_URL_ISSUE = 'https://api.github.com/repos/MaxTeiger/{repo}/issues/{pr}'
+GH_URL_PULL = 'https://api.github.com/repos/coopengo/{repo}/pulls/{pr}'
+GH_URL_ISSUE = 'https://api.github.com/repos/coopengo/{repo}/issues/{pr}'
 GH_HEADERS = {'Authorization': 'Bearer {}'.format(GH_TOKEN)}
 
 RM_URL = 'https://support.coopengo.com/issues/{issue}.json'
@@ -197,7 +197,7 @@ def check_files():
         if not isInPr:
             print('issues:ko:issue:{} not in files'.format(n))
             ok = False
-            
+
     return ok
 
 
