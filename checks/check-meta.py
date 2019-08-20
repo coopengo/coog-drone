@@ -40,7 +40,7 @@ def regex_check(part):
         print("%s:ko" % part)
         print("-" * 5, ' %s ' % part, "-" * 5)
         print(gh_pull[part])
-        print("-" * (10 + len(part) + 2))
+        print("-" * (10 + len(part) + 4))
         print("does not match ", str(regexes[part]))
         print("\n")
     return bool(matches)
