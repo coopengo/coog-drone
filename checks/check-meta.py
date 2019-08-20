@@ -43,7 +43,7 @@ def regex_check(part):
         print("-" * (10 + len(part) + 4))
         print("does not match ", str(regexes[part]))
         print("\n")
-    return bool(matches)
+    return matches
 
 
 def set_gh_pull():
@@ -95,7 +95,7 @@ def check_title():
         print('title:bypass')
         return True
     else:
-        return regex_check('title')
+        return bool(regex_check('title'))
 
 
 def check_body():
