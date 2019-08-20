@@ -37,8 +37,7 @@ rm_issue_type = None
 def regex_check(part):
     matches = regexes[part].match(gh_pull[part])
     if not matches:
-        print(part)
-        print("-" * 5, ' %s ', "-" * 5)
+        print("-" * 5, ' %s ' % part, "-" * 5)
         print(gh_pull[part])
         print("-" * 5)
         print("does not match  ", str(regexes[part]))
