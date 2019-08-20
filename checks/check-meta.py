@@ -19,9 +19,9 @@ RM_URL = 'https://support.coopengo.com/issues/{issue}.json'
 RM_HEADERS = {'X-Redmine-API-Key': RM_TOKEN}
 
 regexes = {
-'title': re.compile('\w+: .+'),
-'body': re.compile('.*(fix|ref) #(\d+)', re.M | re.I | re.S),
-'changelog': re.compile('\* (BUG|FEA|OTH)#(\d+)')
+    'title': re.compile('\w+: .+'),
+    'body': re.compile('.*(fix|ref) #(\d+)', re.M | re.I | re.S),
+    'changelog': re.compile('\* (BUG|FEA|OTH)#(\d+)')
 }
 
 rm_trackers = {1: 'bug', 2: 'fea'}
@@ -35,14 +35,15 @@ rm_issue_type = None
 
 
 def regex_check(part):
-    matches = regexes[key].match(gh_pull[part])
+    matches = regexes[part].match(gh_pull[part])
     if not matches:
         print(part)
         print("-" * 5, ' %s ', "-" * 5)
         print(gh_pull[part])
         print("-" * 5)
-        print("does not match  ", str(regexes[key]))
+        print("does not match  ", str(regexes[part]))
     return bool(matches)
+
 
 def set_gh_pull():
     url = GH_URL_PULL.format(repo=REPO, pr=PR)
@@ -95,9 +96,9 @@ def check_title():
     else:
         return regex_check('title')
 
+
 def check_body():
     ok = True
-    m = body_regexp.match(gh_pull['body'])
     m = regex_check('body')
     if m:
         issue = int(m.group(2))
@@ -136,7 +137,8 @@ def _check_content_changelog_line(label, line):
                     label, issue, rm_issue)))
             else:
                 rm_issue = issue
-                print(('content:ok:changelog:{}:issue:{}'.format(label, issue)))
+                print(('content:ok:changelog:{}:issue:{}'.format(label,
+                    issue)))
         else:
             print(('content:ok:changelog:{}:issue_type:{}'.format(
                     label, issue_type)))
