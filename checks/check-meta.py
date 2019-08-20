@@ -18,9 +18,11 @@ GH_HEADERS = {'Authorization': 'Bearer {}'.format(GH_TOKEN)}
 RM_URL = 'https://support.coopengo.com/issues/{issue}.json'
 RM_HEADERS = {'X-Redmine-API-Key': RM_TOKEN}
 
-title_regexp = re.compile('\w+: .+')
-body_regexp = re.compile('.*(fix|ref) #(\d+)', re.M | re.I | re.S)
-changelog_regexp = re.compile('\* (BUG|FEA|OTH)#(\d+)')
+regexes = {
+'title': re.compile('\w+: .+'),
+'body': re.compile('.*(fix|ref) #(\d+)', re.M | re.I | re.S),
+'changelog': re.compile('\* (BUG|FEA|OTH)#(\d+)')
+}
 
 rm_trackers = {1: 'bug', 2: 'fea'}
 issues_projects = [1, 31, 37]
@@ -31,6 +33,16 @@ gh_labels = None
 rm_issue = None
 rm_issue_type = None
 
+
+def regex_check(part):
+    matches = regexes[key].match(gh_pull[part])
+    if not matches:
+        print(part)
+        print("-" * 5, ' %s ', "-" * 5)
+        print(gh_pull[part])
+        print("-" * 5)
+        print("does not match  ", str(regexes[key]))
+    return bool(matches)
 
 def set_gh_pull():
     url = GH_URL_PULL.format(repo=REPO, pr=PR)
@@ -77,21 +89,16 @@ def check_labels():
 
 
 def check_title():
-    ok = True
     if 'bypass title check' in gh_labels:
         print('title:bypass')
+        return True
     else:
-        if title_regexp.match(gh_pull['title']):
-            print('title:ok')
-        else:
-            ok = False
-            print('title:ko')
-    return ok
-
+        return regex_check('title')
 
 def check_body():
     ok = True
     m = body_regexp.match(gh_pull['body'])
+    m = regex_check('body')
     if m:
         issue = int(m.group(2))
         global rm_issue
@@ -103,13 +110,12 @@ def check_body():
             rm_issue = issue
     else:
         ok = False
-        print('body:ko')
     return ok
 
 
 def _check_content_changelog_line(label, line):
     ok = True
-    m = changelog_regexp.match(line)
+    m = regexes('changelog').match(line)
     if m:
         issue_type = m.group(1).lower()
         if issue_type != 'oth':
