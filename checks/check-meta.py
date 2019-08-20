@@ -37,10 +37,12 @@ rm_issue_type = None
 def regex_check(part):
     matches = regexes[part].match(gh_pull[part])
     if not matches:
+        print("%s:ko" % part)
         print("-" * 5, ' %s ' % part, "-" * 5)
         print(gh_pull[part])
         print("-" * 5)
         print("does not match  ", str(regexes[part]))
+        print("\n")
     return bool(matches)
 
 
