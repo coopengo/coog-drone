@@ -117,7 +117,7 @@ def check_body():
 
 def _check_content_changelog_line(label, line):
     ok = True
-    m = regexes('changelog').match(line)
+    m = regexes['changelog'].match(line)
     if m:
         issue_type = m.group(1).lower()
         if issue_type != 'oth':
