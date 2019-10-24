@@ -37,6 +37,8 @@ RUN apk add --no-cache \
         "phonenumbers" \
         "passlib" \
         "pyjwt" \
+        "requests-mock" \
+        "zeep" \
     && rm -rf /root/.cache \
     && find / -name "__pycache__" -prune -exec rm -rf {} \;
 
