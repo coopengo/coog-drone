@@ -39,6 +39,7 @@ RUN apk add --no-cache \
         "pyjwt" \
         "requests-mock" \
         "zeep" \
+        "PyPDF2" \
     && rm -rf /root/.cache \
     && find / -name "__pycache__" -prune -exec rm -rf {} \;
 
