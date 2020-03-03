@@ -16,6 +16,8 @@ init_conf() {
         echo "testing = True"
         echo "[async]"
         echo "rq = redis://127.0.0.1:6379/1"
+        echo "[cache]"
+        echo "uri = redis://127.0.0.1:6379/0"
     } > /workspace/drone/conf/trytond.conf
 }
 
