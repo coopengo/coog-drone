@@ -38,6 +38,7 @@ RUN apk add --no-cache \
         "passlib" \
         "pyjwt" \
         "requests-mock" \
+        "xmlrunner" \
         "zeep" \
         "PyPDF2" \
     && rm -rf /root/.cache \
