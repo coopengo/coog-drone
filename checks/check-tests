@@ -3,8 +3,8 @@
 
 init_bin() {
     echo "1. Init bin"
-    ln -s /workspace/drone/tryton/bin/trytond /usr/local/bin/trytond
-    ln -s /workspace/drone/trytond/bin/trytond-admin /usr/local/bin/trytond-admin
+    ln -s /drone/src/tryton/bin/trytond /usr/local/bin/trytond
+    ln -s /drone/src/trytond/bin/trytond-admin /usr/local/bin/trytond-admin
 }
 
 init_conf() {
@@ -18,16 +18,16 @@ init_conf() {
         echo "rq = redis://127.0.0.1:6379/1"
         echo "[cache]"
         echo "uri = redis://redis:6379/0"
-    } > /workspace/drone/conf/trytond.conf
+    } > /drone/src/conf/trytond.conf
 }
 
 _link_modules() {
-    find /workspace/drone/trytond/trytond/modules -type l -delete
-    ln -s "/workspace/drone/trytond-modules/modules/"* . || return 1
-    ln -s "/workspace/drone/coog/modules/"* . || return 1
+    find /drone/src/trytond/trytond/modules -type l -delete
+    ln -s "/drone/src/trytond-modules/modules/"* . || return 1
+    ln -s "/drone/src/coog/modules/"* . || return 1
     if [ "$DRONE_REPO_NAME" = "customers" ]
     then
-        ln -s "/workspace/drone/customers/modules/"* . || return 1
+        ln -s "/drone/src/customers/modules/"* . || return 1
     else
         return 0
     fi
@@ -35,15 +35,15 @@ _link_modules() {
 
 link_modules() {
     echo "3. Link modules"
-    (cd /workspace/drone/trytond/trytond/modules && _link_modules)
+    (cd /drone/src/trytond/trytond/modules && _link_modules)
 }
 
 check_module() {
     echo "Test $1"
     if [ ! "$1" = "global_tests" ]; then
         LOG_LEVEL=DEBUG python -W ignore \
-            /workspace/drone/trytond/trytond/tests/run-tests.py \
-            -c /workspace/drone/conf/trytond.conf -vv -m "$1"
+            /drone/src/trytond/trytond/tests/run-tests.py \
+            -c /drone/src/conf/trytond.conf -vv -m "$1"
     else
         echo "    global_tests bypassed for performance reason"
     fi
@@ -54,7 +54,7 @@ check_modules() {
     unset DB_NAME
     unset TRYTOND_CACHE_CLASS
     local modules
-    modules=$(/workspace/drone/tests/checks/utils/modules.py 2>&1)
+    modules=$(/drone/src/tests/checks/utils/modules.py 2>&1)
     [ $? -ne 0 ] && echo "$modules" && return 1
     local ret; ret=0
     for module in $modules
@@ -66,7 +66,7 @@ check_modules() {
 }
 
 main() {
-    mkdir /workspace/drone/conf &&
+    mkdir /drone/src/conf &&
         init_bin &&
         init_conf &&
         link_modules &&

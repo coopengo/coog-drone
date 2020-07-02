@@ -3,13 +3,13 @@
 
 check_module() {
     echo "Check module $1"
-    flake8 --config=/workspace/drone/coog/tox.ini \
-        "/workspace/drone/coog/modules/$1"
+    flake8 --config=/drone/src/coog/tox.ini \
+        "/drone/src/coog/modules/$1"
 }
 
 main() {
     local modules
-    modules=$(/workspace/drone/tests/checks/utils/modules.py 2>&1)
+    modules=$(/drone/src/tests/checks/utils/modules.py 2>&1)
     [ $? -ne 0 ] && echo "$modules" && return 1
     local ret=0
     for module in $modules

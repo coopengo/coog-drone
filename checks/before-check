@@ -22,13 +22,13 @@ main() {
 
         echo "Coog branch/version will be $branch."
 
-        git clone -b "$branch" --depth=1 https://github.com/coopengo/coog /workspace/drone/coog
-        [ ! -d /workspace/drone/customers/modules ] && return 0
+        git clone -b "$branch" --depth=1 https://github.com/coopengo/coog /drone/src/coog
+        [ ! -d /drone/src/customers/modules ] && return 0
     fi
 
-    git clone --depth=1 --recursive --branch "$branch" https://github.com/coopengo/trytond.git /workspace/drone/trytond &&
-        git clone --depth=1 --recursive --branch "$branch" https://github.com/coopengo/trytond-modules.git /workspace/drone/trytond-modules &&
-        git clone --depth=1 --recursive --branch "$branch" https://github.com/coopengo/proteus.git /workspace/drone/proteus
+    git clone --depth=1 --recursive --branch "$branch" https://github.com/coopengo/trytond.git /drone/src/trytond &&
+        git clone --depth=1 --recursive --branch "$branch" https://github.com/coopengo/trytond-modules.git /drone/src/trytond-modules &&
+        git clone --depth=1 --recursive --branch "$branch" https://github.com/coopengo/proteus.git /drone/src/proteus
 }
 
 main
