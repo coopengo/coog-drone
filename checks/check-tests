@@ -25,7 +25,7 @@ init_conf() {
 _link_modules() {
     find /drone/src/trytond/trytond/modules -type l -delete
     ln -s "/drone/src/trytond-modules/modules/"* . || return 1
-    ln -s "/drone/src/coog/modules/"* . || return 1
+    ln -s "/drone/src/modules/"* . || return 1
     if [ "$DRONE_REPO_NAME" = "customers" ]
     then
         ln -s "/drone/src/customers/modules/"* . || return 1
