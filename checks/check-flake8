@@ -3,7 +3,7 @@
 
 check_module() {
     echo "Check module $1"
-    flake8 --config=/drone/src/coog/tox.ini \
+    flake8 --config=/drone/src/tox.ini \
         "/drone/src/modules/$1"
 }
 
