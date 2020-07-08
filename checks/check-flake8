@@ -1,6 +1,6 @@
 #!/bin/sh
 # vim: ft=sh ts=4 sw=4 et
-set -x
+
 check_module() {
     echo "Check module $1"
     flake8 --config=/drone/src/coog/tox.ini \
@@ -19,5 +19,5 @@ main() {
     done
     return "$ret"
 }
-sleep 3600
+
 main
