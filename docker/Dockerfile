@@ -9,6 +9,7 @@ RUN apk add --no-cache \
         "fastjsonschema==2.13" \
         "flake8" \
         "pyflakes" \
+        "ebcdic" \
         "ipaddress" \
         "dateutils" \
         "num2words" \
