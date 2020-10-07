@@ -13,7 +13,7 @@ RUN apk add --no-cache \
         "ipaddress" \
         "dateutils" \
         "num2words" \
-        "python-sql" \
+        "python-sql==1.1.0" \
         "polib" \
         "Genshi" \
         "relatorio" \
