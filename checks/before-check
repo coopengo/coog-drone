@@ -12,6 +12,9 @@ main() {
         if [ $? -eq 0 ]
         then
             branch="master"
+        elif [ "$branch" = "cegema-coog-base-cegema-2.11.2050" ]
+        then
+            branch="coog-base-cegema-2.11.2050"
         else
             echo "$DRONE_BRANCH" | grep -qE "coog-1\.(12|14)"
             if [ $? -eq 0 ]
