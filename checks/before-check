@@ -1,6 +1,8 @@
 #!/bin/sh
 # vim: ft=sh ts=4 sw=4 et
 
+set -x
+
 main() {
     local branch
     branch="$DRONE_BRANCH"
