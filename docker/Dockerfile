@@ -37,7 +37,7 @@ RUN apk add --no-cache \
         "mock" \
         "phonenumbers" \
         "passlib" \
-        "pyjwt" \
+        "pyjwt==1.7.1" \
         "requests-mock" \
         "validate_email" \
         "xmlrunner" \
