@@ -44,7 +44,7 @@ RUN apk add --no-cache \
         "xmlrunner" \
         "zeep" \
         "PyPDF2" \
-        "cryptography" \
+        "cryptography==2.6.1" \
     && rm -rf /root/.cache \
     && find / -name "__pycache__" -prune -exec rm -rf {} \;
 
