@@ -40,7 +40,9 @@ link_modules() {
 
 check_module() {
     echo "Test $1"
-    if [ ! "$1" = "global_tests" ]; then
+    if [ ! -d /drone/src/trytond/trytond/modules/$1 ]; then
+        echo "    check_module: Module $1 was removed - not testing"
+    elif [ ! "$1" = "global_tests" ]; then
         LOG_LEVEL=DEBUG python -W ignore \
             /drone/src/trytond/trytond/tests/run-tests.py \
             -c /drone/src/conf/trytond.conf -vv -m "$1"
