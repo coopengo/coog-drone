@@ -6,10 +6,9 @@ check_module() {
     module_dir="/drone/src/modules/$1"
     if [ -d $module_dir ]; then
         echo "Check module $1"
-        flake8 --config=/drone/src/coog/tox.ini \
-            "/drone/src/modules/$1"
+        flake8 --config=/drone/src/coog/tox.ini "$module_dir"
     else
-        echo "Module $i removed ; skipping"
+        echo "Module $1 removed ; skipping"
     fi
 }
 
