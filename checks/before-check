@@ -47,4 +47,9 @@ checkout() {
         git clone --depth=1 --recursive --branch "$branch" https://github.com/coopengo/proteus.git /drone/src/proteus
 }
 
+main() {
+    fail_if_cherry_pick
+    checkout
+}
+
 main
