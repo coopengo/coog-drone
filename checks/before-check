@@ -3,18 +3,7 @@
 
 set -x
 
-fail_if_cherry_pick() {
-    local message
-    message="$DRONE_COMMIT_MESSAGE"
-
-    # If commit message is in the form "module: [x.y] ...." it is considered as
-    # a cherry-pick as described in https://github.com/coopengo/coog/wiki/dev-workflow
-    echo "$DRONE_COMMIT_MESSAGE" | grep '\w+: \[[[:digit:]]+\.[[:digit:]]+\]' && \
-        echo "Cherry-pick, no test required" && exit 1
-}
-
-checkout() {
-
+main() {
     local branch
     branch="$DRONE_BRANCH"
     if [ "$DRONE_REPO_NAME" = "customers" ]
@@ -45,11 +34,6 @@ checkout() {
     git clone --depth=1 --recursive --branch "$branch" https://github.com/coopengo/trytond.git /drone/src/trytond &&
         git clone --depth=1 --recursive --branch "$branch" https://github.com/coopengo/trytond-modules.git /drone/src/trytond-modules &&
         git clone --depth=1 --recursive --branch "$branch" https://github.com/coopengo/proteus.git /drone/src/proteus
-}
-
-main() {
-    fail_if_cherry_pick
-    checkout
 }
 
 main
