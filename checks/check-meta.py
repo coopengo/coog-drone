@@ -90,6 +90,15 @@ def check_labels():
     return True
 
 
+def check_run_tests():
+    if 'run_tests' in gh_labels:
+        print('run_tests:ok')
+        return True
+    else:
+        print(r'run_tests:ko')
+        return False
+
+
 def check_title():
     if 'bypass title check' in gh_labels:
         print('title:bypass')
@@ -226,6 +235,11 @@ def main():
             sys.exit(0)
         else:
             sys.exit(1)
+
+    if not check_run_tests():
+        print('meta:abort')
+        sys.exit(1)
+
     ok = True
     ok = check_labels() and ok
     ok = check_title() and ok
