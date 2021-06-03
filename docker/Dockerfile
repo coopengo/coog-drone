@@ -30,8 +30,8 @@ RUN apk add --no-cache \
         "simpleeval" \
         "ldap3" \
         "requests" \
-        "raven" \
         "redis<3" \
+        "sentry-sdk" \
         "msgpack-python" \
         "celery" \
         "rq" \
