@@ -45,6 +45,7 @@ RUN apk add --no-cache \
         "zeep" \
         "PyPDF4" \
         "pdfminer.six" \
+        "graphene" \
         "cryptography==2.6.1" \
     && rm -rf /root/.cache \
     && find / -name "__pycache__" -prune -exec rm -rf {} \;
