@@ -10,16 +10,31 @@ REPO = os.environ['DRONE_REPO_NAME']
 PR = os.environ['DRONE_PULL_REQUEST']
 TOKEN = os.environ['GITHUB_TOKEN']
 
-URL_TPL = 'https://api.github.com/repos/coopengo/{repo}/pulls/{pr}/files'
+URL_TPL = 'https://api.github.com/repos/coopengo/{repo}/pulls/{pr}/files?per_page=100'
 URL = URL_TPL.format(repo=REPO, pr=PR)
 AUTH = 'Bearer {}'.format(TOKEN)
 
 
 def main(args):
-    r = requests.get(URL, headers={'Authorization': AUTH})
-    if r.status_code < 200 or r.status_code > 300:
-        raise Exception(r.text)
-    files = [f['filename'] for f in r.json()]
+    files = []
+    page = 1
+
+    def read():
+        r = requests.get(URL + '&page=%i' % page, headers={'Authorization': AUTH})
+        if r.status_code < 200 or r.status_code > 300:
+            raise Exception(r.text)
+        return [f['filename'] for f in r.json()]
+
+    while True:
+        new_files = read()
+        files += new_files
+
+        # If we got exactly the max number, we have to keep going
+        if len(new_files) == 100:
+            page += 1
+        else:
+            break
+
     modules = []
     for f in files:
         s = f.split('/')
