@@ -76,7 +76,7 @@ def get_gh_files():
     page = 1
 
     def read():
-        url = (GH_URL_PULL + '/files').format(repo=REPO, pr=PR)
+        url = (GH_URL_PULL + '/files?per_page=100').format(repo=REPO, pr=PR)
         r = requests.get(url + '&page=%i' % page, headers=GH_HEADERS)
         if r.status_code < 200 or r.status_code > 300:
             raise Exception(r.text)
