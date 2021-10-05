@@ -15,7 +15,7 @@ URL = URL_TPL.format(repo=REPO, pr=PR)
 AUTH = 'Bearer {}'.format(TOKEN)
 
 
-def main(args):
+def get_gh_files():
     files = []
     page = 1
 
@@ -23,7 +23,7 @@ def main(args):
         r = requests.get(URL + '&page=%i' % page, headers={'Authorization': AUTH})
         if r.status_code < 200 or r.status_code > 300:
             raise Exception(r.text)
-        return [f['filename'] for f in r.json()]
+        return r.json()
 
     while True:
         new_files = read()
@@ -34,6 +34,12 @@ def main(args):
             page += 1
         else:
             break
+
+    return files
+
+
+def main(args):
+    files = [x['filename'] for x in get_gh_files()]
 
     modules = []
     for f in files:

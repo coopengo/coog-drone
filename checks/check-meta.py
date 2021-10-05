@@ -72,12 +72,27 @@ def set_gh_labels():
 
 
 def get_gh_files():
-    url = (GH_URL_PULL + '/files').format(repo=REPO, pr=PR)
-    r = requests.get(url, headers=GH_HEADERS)
-    if r.status_code < 200 or r.status_code > 300:
-        print(('error:gh:{}:{}:{}'.format(url, r.status_code, r.text)))
-        sys.exit(1)
-    return r.json()
+    files = []
+    page = 1
+
+    def read():
+        url = (GH_URL_PULL + '/files').format(repo=REPO, pr=PR)
+        r = requests.get(url + '&page=%i' % page, headers=GH_HEADERS)
+        if r.status_code < 200 or r.status_code > 300:
+            raise Exception(r.text)
+        return r.json()
+
+    while True:
+        new_files = read()
+        files += new_files
+
+        # If we got exactly the max number, we have to keep going
+        if len(new_files) == 100:
+            page += 1
+        else:
+            break
+
+    return files
 
 
 def check_labels():
