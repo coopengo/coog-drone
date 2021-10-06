@@ -5,7 +5,7 @@ RUN apt-get update && apt-get install -y ca-certificates
 RUN git clone -b v1.9.2 --depth=1 https://github.com/drone/drone
 RUN cd drone && go install -trimpath -ldflags='-w -s' -tags nolimit ./cmd/drone-server
 
-FROM debian:buster-slim
+FROM debian:10.10-slim
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /go/bin/drone-server /
